@@ -1,6 +1,8 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -10,34 +12,34 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name="firstname", nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(name="lastname", nullable = false)
     private String lastName;
 
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name="passwordhash", nullable = false)
     private String passwordHash;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(name = "createdat", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    @Column(name = "updatedat", nullable = false)
+    @UpdateTimestamp
+    @Column(name = "updatedat", nullable = true)
     private LocalDateTime updatedAt;
 
-    public User(Long id, String firstName, String lastName, String email,
-                String passwordHash, LocalDateTime updatedAt, LocalDateTime createdAt) {
+    public Users(Long id, String firstName, String lastName, String email,
+                 String passwordHash, LocalDateTime updatedAt, LocalDateTime createdAt) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
