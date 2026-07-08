@@ -2,6 +2,7 @@ package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Users;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.UserAuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,7 @@ public class UserAuthController {
     private UserAuthService userAuthService;
 
     @PostMapping("/Create")
-    public ResponseEntity<Users> createAccount(@RequestBody Users user){
+    public ResponseEntity<Users> createAccount(@RequestBody @Valid Users user){
         return ResponseEntity.ok(userAuthService.createAccount(user));
     }
 

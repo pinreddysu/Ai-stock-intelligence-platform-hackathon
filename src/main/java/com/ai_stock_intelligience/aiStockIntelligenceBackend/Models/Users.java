@@ -1,10 +1,11 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Models;
-
+import static com.ai_stock_intelligience.aiStockIntelligenceBackend.Constants.UserConstants.regexPatternName;
+import static com.ai_stock_intelligience.aiStockIntelligenceBackend.Constants.UserConstants.regexPatternEmail;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -19,15 +20,22 @@ public class Users {
     private Long id;
 
     @Column(name="firstname", nullable = false)
+    @NotBlank(message = "First Name is required")
+    @Pattern(regexp = regexPatternName)
     private String firstName;
 
     @Column(name="lastname", nullable = false)
+    @NotBlank(message = "Last Name is required")
+    @Pattern(regexp = regexPatternName)
     private String lastName;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "Email Address is required")
+//    @Pattern(regexp = regexPatternEmail, message = "Email must be in format Text@emailproveder.extension")
     private String email;
 
     @Column(name="passwordhash", nullable = false)
+    @NotBlank(message = "Password is required")
     private String passwordHash;
 
     @CreationTimestamp
