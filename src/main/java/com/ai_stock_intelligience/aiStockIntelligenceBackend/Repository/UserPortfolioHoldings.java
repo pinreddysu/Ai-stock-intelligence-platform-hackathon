@@ -1,0 +1,9 @@
+package com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository;
+
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UserPortfolioHoldings extends JpaRepository<UserPortfolio, Long> {
+}
