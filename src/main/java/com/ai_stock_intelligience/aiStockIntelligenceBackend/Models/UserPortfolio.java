@@ -33,14 +33,22 @@ public class UserPortfolio {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Column(name = "deletedat")
+    private LocalDateTime deletedAt;
+
+    public UserPortfolio() {
+    }
+
     public UserPortfolio(Long userId, Long id, String portfolioName,
-                         String description, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                         String description, LocalDateTime createdAt, LocalDateTime updatedAt,
+                         LocalDateTime deletedAt) {
         this.userId = userId;
         this.id = id;
         this.portfolioName = portfolioName;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.deletedAt = deletedAt;
     }
 
     public Long getId() {
@@ -89,5 +97,13 @@ public class UserPortfolio {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }
