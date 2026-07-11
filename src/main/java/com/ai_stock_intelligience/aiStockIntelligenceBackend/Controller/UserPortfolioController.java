@@ -30,8 +30,15 @@ public class UserPortfolioController {
 
     @PatchMapping("/editPortfolioDetails")
     public ResponseEntity<UserPortfolio> updatePortfolioById(@RequestBody UserPortfolio userPortfolio){
-        return ResponseEntity.ok(userPortfolioService.updatePortfolioDetails(userPortfolio));
+        UserPortfolio updatedUserPortfolio = userPortfolioService.updatePortfolioDetails(userPortfolio);
+        if (updatedUserPortfolio != null) {
+            return ResponseEntity.ok(userPortfolioService.updatePortfolioDetails(userPortfolio));
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
+
 
     @PatchMapping("/deletePortfolio")
     public ResponseEntity<String> deletePortfolio(@RequestBody UserPortfolio userPortfolio){

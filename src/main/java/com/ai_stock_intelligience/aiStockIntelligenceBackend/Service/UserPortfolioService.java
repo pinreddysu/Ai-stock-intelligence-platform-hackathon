@@ -38,14 +38,19 @@ public class UserPortfolioService {
 
         UserPortfolio currentPortfolioInfo = userPortfolioRepository.findByIdAndDeletedAtIsNull(userPortfolio.getId());
 
-        if (userPortfolio.getPortfolioName() != null) {
-            currentPortfolioInfo.setPortfolioName(userPortfolio.getPortfolioName());
-        }
+        if (currentPortfolioInfo != null) {
+            if (userPortfolio.getPortfolioName() != null) {
+                currentPortfolioInfo.setPortfolioName(userPortfolio.getPortfolioName());
+            }
 
-        if (userPortfolio.getDescription() != null) {
-            currentPortfolioInfo.setDescription(userPortfolio.getDescription());
-        }
+            if (userPortfolio.getDescription() != null) {
+                currentPortfolioInfo.setDescription(userPortfolio.getDescription());
+            }
 
-        return userPortfolioRepository.save(currentPortfolioInfo);
+            return userPortfolioRepository.save(currentPortfolioInfo);
+        }
+        else {
+            return null;
+        }
     }
 }
