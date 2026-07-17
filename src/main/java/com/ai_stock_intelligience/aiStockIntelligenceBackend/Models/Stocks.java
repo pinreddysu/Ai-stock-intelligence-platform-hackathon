@@ -40,6 +40,9 @@ public class Stocks {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+//    @OneToOne(mappedBy = "portfolioholdings")
+//    private PortfolioHoldings portfolioHoldings;
+
     public Stocks(Long id, String ticker, String companyName, String sector,
                   String exchange, String industry, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
