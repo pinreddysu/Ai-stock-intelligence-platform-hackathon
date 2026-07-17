@@ -19,12 +19,12 @@ public interface UserPortfolioRepository extends JpaRepository<UserPortfolio, Lo
     @Query("UPDATE UserPortfolio u SET u.deletedAt = CURRENT_TIMESTAMP WHERE u.id = :id")
     Long deletePortfolio(@Param("id") Long id);
 
-    boolean existsByPortfolioNameAndUserIdAndDeletedAt(String portfolioName, Long userId, LocalDateTime deletedAt);
+    boolean existsByPortfolioNameAndUserIdAndDeletedAtIsNotNull(String portfolioName, Long userId);
 
-    boolean existsByIdAndDeletedAtIsNull(Long id);
+    boolean existsByIdAndUserIdAndDeletedAtIsNull(Long id, Long userId);
 
     List<UserPortfolio> findByUserIdAndDeletedAtIsNull(Long userId);
 
-    UserPortfolio findByIdAndDeletedAtIsNull(Long id);
+    UserPortfolio findByIdAndUserIdAndDeletedAtIsNull(Long id, Long userId);
 
 }
