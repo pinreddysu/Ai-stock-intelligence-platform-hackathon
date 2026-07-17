@@ -1,7 +1,11 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.CreatePortfolioRequestDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfolioRequestDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.UpdatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.UserPortfolioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +20,7 @@ public class UserPortfolioController {
     private UserPortfolioService userPortfolioService;
 
     @PostMapping("/createPortfolio")
-    public ResponseEntity<String> createPortfolio(@RequestBody UserPortfolio userPortfolio){
+    public ResponseEntity<String> createPortfolio(@Valid @RequestBody CreatePortfolioRequestDto userPortfolio){
         if(userPortfolioService.createPortfolio(userPortfolio)){
             return ResponseEntity.badRequest().body("Portfolio already exists with that name");
         }
@@ -24,15 +28,15 @@ public class UserPortfolioController {
     }
 
     @GetMapping("/myPortfolios")
-    public ResponseEntity<List<UserPortfolio>> getListOfPortfoliosByUser(@RequestBody UserPortfolio userPortfolio){
-        return ResponseEntity.ok(userPortfolioService.getListOfPortfoliosByUser(userPortfolio));
+    public ResponseEntity<List<UserPortfolio>> getListOfPortfoliosByUser(){
+        return ResponseEntity.ok(userPortfolioService.getListOfPortfoliosByUser());
     }
 
     @PatchMapping("/editPortfolioDetails")
-    public ResponseEntity<UserPortfolio> updatePortfolioById(@RequestBody UserPortfolio userPortfolio){
+    public ResponseEntity<UserPortfolio> updatePortfolioById(@Valid @RequestBody UpdatePortfolioRequestDto userPortfolio){
         UserPortfolio updatedUserPortfolio = userPortfolioService.updatePortfolioDetails(userPortfolio);
         if (updatedUserPortfolio != null) {
-            return ResponseEntity.ok(userPortfolioService.updatePortfolioDetails(userPortfolio));
+            return ResponseEntity.ok(updatedUserPortfolio);
         }
         else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -41,7 +45,7 @@ public class UserPortfolioController {
 
 
     @PatchMapping("/deletePortfolio")
-    public ResponseEntity<String> deletePortfolio(@RequestBody UserPortfolio userPortfolio){
+    public ResponseEntity<String> deletePortfolio(@Valid @RequestBody DeletePortfolioRequestDto userPortfolio){
         if(userPortfolioService.deletePortfolio(userPortfolio) != null){
             return ResponseEntity.ok("Portfolio deleted");
         }
