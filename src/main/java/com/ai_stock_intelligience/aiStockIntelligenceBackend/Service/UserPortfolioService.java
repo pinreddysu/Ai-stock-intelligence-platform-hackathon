@@ -1,5 +1,8 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Service;
 
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.CreatePortfolioRequestDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfolioRequestDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.UpdatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserPortfolioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,30 +16,38 @@ public class UserPortfolioService {
     @Autowired
     private UserPortfolioRepository userPortfolioRepository;
 
-    public boolean createPortfolio(UserPortfolio userPortfolio) {
-        if (userPortfolioRepository.existsByPortfolioNameAndUserIdAndDeletedAt(
-                userPortfolio.getPortfolioName(), userPortfolio.getUserId(), userPortfolio.getDeletedAt())){
+    public boolean createPortfolio(CreatePortfolioRequestDto userPortfolio) {
+        Long currentUserId = null; //JWT
+        if (userPortfolioRepository.existsByPortfolioNameAndUserIdAndDeletedAtIsNotNull(
+                userPortfolio.getPortfolioName(), currentUserId)){
             return true;
         }
-        userPortfolioRepository.save(userPortfolio);
+        UserPortfolio portfolio = new UserPortfolio();
+        portfolio.setUserId(currentUserId);
+        portfolio.setPortfolioName(userPortfolio.getPortfolioName());
+        portfolio.setDescription(userPortfolio.getDescription());
+        userPortfolioRepository.save(portfolio);
         return false;
     }
 
-    public Long deletePortfolio(UserPortfolio userPortfolio){
-        if (userPortfolioRepository.existsByIdAndDeletedAtIsNull(userPortfolio.getId())){
+    public Long deletePortfolio(DeletePortfolioRequestDto userPortfolio){
+        Long currentUserId = null; //JWT
+        if (userPortfolioRepository.existsByIdAndUserIdAndDeletedAtIsNull(userPortfolio.getId(), currentUserId)){
             return userPortfolioRepository.deletePortfolio(userPortfolio.getId());
         }
         return null;
     }
 
-    public List<UserPortfolio> getListOfPortfoliosByUser(UserPortfolio userPortfolio) {
-        return userPortfolioRepository.findByUserIdAndDeletedAtIsNull(userPortfolio.getUserId());
+    public List<UserPortfolio> getListOfPortfoliosByUser() {
+        Long currentUserId = null; //JWT
+        return userPortfolioRepository.findByUserIdAndDeletedAtIsNull(currentUserId);
     }
 
 
-    public UserPortfolio updatePortfolioDetails(UserPortfolio userPortfolio) {
+    public UserPortfolio updatePortfolioDetails(UpdatePortfolioRequestDto userPortfolio) {
 
-        UserPortfolio currentPortfolioInfo = userPortfolioRepository.findByIdAndDeletedAtIsNull(userPortfolio.getId());
+        Long currentUserId = null; //JWt
+        UserPortfolio currentPortfolioInfo = userPortfolioRepository.findByIdAndUserIdAndDeletedAtIsNull(userPortfolio.getId(), currentUserId);
 
         if (currentPortfolioInfo != null) {
             if (userPortfolio.getPortfolioName() != null) {
