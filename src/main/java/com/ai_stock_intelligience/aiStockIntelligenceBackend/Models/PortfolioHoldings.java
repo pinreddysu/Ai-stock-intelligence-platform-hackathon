@@ -19,14 +19,14 @@ public class PortfolioHoldings {
     @Column(name = "portfolioid", nullable = false)
     private Long portfolioId;
 
-    @Column(name = "stockid", nullable = false)
+    @Column(name = "stockid", nullable = false, insertable = false, updatable = false)
     private Long stockId;
 
     @Column(name = "shares", nullable = false)
     private Long shares;
 
     @Column(name = "avgprice", nullable = false)
-    private double avgPrice;
+    private Double avgPrice;
 
     @Column(name = "createdat", nullable = false, updatable = false)
     @CreationTimestamp
@@ -36,8 +36,12 @@ public class PortfolioHoldings {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "stockid")
+    private Stocks stocks;
+
     public PortfolioHoldings(Long id, Long portfolioId, Long stockId, Long shares,
-                             double avgPrice, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                             Double avgPrice, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.portfolioId = portfolioId;
         this.stockId = stockId;
@@ -79,11 +83,11 @@ public class PortfolioHoldings {
         this.shares = shares;
     }
 
-    public double getAvgPrice() {
+    public Double getAvgPrice() {
         return avgPrice;
     }
 
-    public void setAvgPrice(double avgPrice) {
+    public void setAvgPrice(Double avgPrice) {
         this.avgPrice = avgPrice;
     }
 
