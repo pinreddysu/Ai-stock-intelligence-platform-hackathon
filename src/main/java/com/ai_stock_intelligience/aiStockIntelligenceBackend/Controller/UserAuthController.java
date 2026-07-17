@@ -1,5 +1,6 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.RegisterRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Users;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.UserAuthService;
 import jakarta.validation.Valid;
@@ -16,12 +17,12 @@ public class UserAuthController {
     private UserAuthService userAuthService;
 
     @PostMapping("/Create")
-    public ResponseEntity<Users> createAccount(@RequestBody @Valid Users user){
+    public ResponseEntity<Users> createAccount(@Valid @RequestBody RegisterRequestDto user){
         return ResponseEntity.ok(userAuthService.createAccount(user));
     }
 
 //    @PostMapping("/Login")
-//    public Users loginAccount(@RequestBody Users user){
+//    public Users loginAccount(@Valid @RequestBody LoginRequestDto user){
 //        return userAuthService.loginAccount(user);
 //    }
 }
