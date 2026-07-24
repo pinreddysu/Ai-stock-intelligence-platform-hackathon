@@ -25,7 +25,10 @@ public class AuthSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
-        httpSecurity.authorizeHttpRequests(request -> request.anyRequest().authenticated());
+        httpSecurity.authorizeHttpRequests(request ->
+                request.requestMatchers("/Create", "/Login")
+                        .permitAll()
+                        .anyRequest().authenticated());
 //        httpSecurity.formLogin(Customizer.withDefaults()); //for webpage
         httpSecurity.httpBasic(Customizer.withDefaults()); //Postman
         httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -37,6 +40,11 @@ public class AuthSecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(new BCryptPasswordEncoder(UserConstants.encryptionStrength)); //tells which password encoder is being used
         return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig){
+        return authConfig.getAuthenticationManager();
     }
 
 
