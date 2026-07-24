@@ -1,5 +1,6 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.LoginRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.RegisterRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Users;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.UserAuthService;
@@ -27,8 +28,8 @@ public class UserAuthController {
         return"TEst";
     }
 
-//    @PostMapping("/Login")
-//    public Users loginAccount(@Valid @RequestBody LoginRequestDto user){
-//        return userAuthService.loginAccount(user);
-//    }
+    @PostMapping("/Login")
+    public String loginAccount(@Valid @RequestBody LoginRequestDto user){
+        return userAuthService.loginAccount(user);
+    }
 }
