@@ -6,6 +6,7 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.UserAuthSer
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,11 @@ public class UserAuthController {
     @PostMapping("/Create")
     public ResponseEntity<Users> createAccount(@Valid @RequestBody RegisterRequestDto user){
         return ResponseEntity.ok(userAuthService.createAccount(user));
+    }
+
+    @GetMapping("/Greet")
+    public String greet(){
+        return"TEst";
     }
 
 //    @PostMapping("/Login")
