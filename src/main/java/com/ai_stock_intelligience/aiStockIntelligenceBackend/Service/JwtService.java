@@ -1,18 +1,20 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Service;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 public class JwtService {
@@ -47,11 +49,45 @@ public class JwtService {
     }
 
     //method to convert string key into bytes and creating secure object so other parts of code cannot modify it
-    public Key getKey(){
+    public SecretKey getKey(){
         System.out.println(secretKey);
 //        byte[] keyBytes = Decoders.BASE64
 //                .decode(secretKey); //converts string key to bytes, (Assumption the plain english text is not the right password, its like a secret code)
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8); //converts plain english key to bytes
         return Keys.hmacShaKeyFor(keyBytes); //verifies the size of the key and creates security object so no other parts of code can modify it
+    }
+
+    public String extractEmail(String token) {
+        return extractClaims(token, Claims::getSubject);
+    }
+
+    public Long extractUserId(String token) {
+        return extractClaims(token, claims -> claims.get("userId", Long.class));
+    }
+
+    public Date extractExpirationDate(String token) {
+        return extractClaims(token,Claims::getExpiration);
+    }
+
+    public boolean validatingToken(String token, UserDetails userDetails) {
+        final String email = extractEmail(token);
+        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    private boolean isTokenExpired(String token){
+        return extractExpirationDate(token).before(new Date());
+    }
+
+    private <T> T extractClaims(String token, Function<Claims, T> claimsResolver){
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token){
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
