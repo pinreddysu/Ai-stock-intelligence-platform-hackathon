@@ -14,10 +14,13 @@ import java.util.List;
 public class UserPortfolioService {
 
     @Autowired
+    private AuthenticationService authenticationService;
+
+    @Autowired
     private UserPortfolioRepository userPortfolioRepository;
 
     public boolean createPortfolio(CreatePortfolioRequestDto userPortfolio) {
-        Long currentUserId = null; //JWT
+        Long currentUserId = authenticationService.getCurrentUserId(); //JWt
         if (userPortfolioRepository.existsByPortfolioNameAndUserIdAndDeletedAtIsNotNull(
                 userPortfolio.getPortfolioName(), currentUserId)){
             return true;
@@ -31,7 +34,7 @@ public class UserPortfolioService {
     }
 
     public Long deletePortfolio(DeletePortfolioRequestDto userPortfolio){
-        Long currentUserId = null; //JWT
+        Long currentUserId = authenticationService.getCurrentUserId(); //JWT
         if (userPortfolioRepository.existsByIdAndUserIdAndDeletedAtIsNull(userPortfolio.getId(), currentUserId)){
             return userPortfolioRepository.deletePortfolio(userPortfolio.getId());
         }
@@ -39,14 +42,13 @@ public class UserPortfolioService {
     }
 
     public List<UserPortfolio> getListOfPortfoliosByUser() {
-        Long currentUserId = null; //JWT
+        Long currentUserId = authenticationService.getCurrentUserId(); //JWt
         return userPortfolioRepository.findByUserIdAndDeletedAtIsNull(currentUserId);
     }
 
 
     public UserPortfolio updatePortfolioDetails(UpdatePortfolioRequestDto userPortfolio) {
-
-        Long currentUserId = null; //JWt
+        Long currentUserId = authenticationService.getCurrentUserId(); //JWt get current user that sent the token
         UserPortfolio currentPortfolioInfo = userPortfolioRepository.findByIdAndUserIdAndDeletedAtIsNull(userPortfolio.getId(), currentUserId);
 
         if (currentPortfolioInfo != null) {
