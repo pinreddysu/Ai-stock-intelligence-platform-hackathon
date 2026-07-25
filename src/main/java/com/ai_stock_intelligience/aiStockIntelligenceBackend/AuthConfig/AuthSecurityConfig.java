@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,6 +24,9 @@ public class AuthSecurityConfig {
 
     @Autowired
     private MyUserDetailsService userDetailsService; //verifies username and password
+
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
@@ -34,6 +38,7 @@ public class AuthSecurityConfig {
 //        httpSecurity.formLogin(Customizer.withDefaults()); //for webpage
         httpSecurity.httpBasic(Customizer.withDefaults()); //Postman
         httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); //Adds Jwt filter before username and password authentication
         return httpSecurity.build();
     }
 
@@ -48,6 +53,4 @@ public class AuthSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig){
         return authConfig.getAuthenticationManager();
     }
-
-
 }
