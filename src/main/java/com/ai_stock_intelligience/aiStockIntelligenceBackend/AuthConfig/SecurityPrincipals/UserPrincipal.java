@@ -31,4 +31,6 @@ public class UserPrincipal implements UserDetails {
     public String getUsername() {
         return users.getEmail();
     }
+
+    public Long getUserId(){ return users.getId();} //added userid field for Daoauth
 }
