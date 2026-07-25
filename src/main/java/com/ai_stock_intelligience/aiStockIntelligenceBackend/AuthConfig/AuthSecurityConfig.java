@@ -49,6 +49,7 @@ public class AuthSecurityConfig {
         return provider;
     }
 
+    //Purpose to tell this filter chain that there are more types of authentication can be processed like JWT or login via username and password. (The default username and password login)
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig){
         return authConfig.getAuthenticationManager();

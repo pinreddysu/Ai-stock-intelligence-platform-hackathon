@@ -10,7 +10,7 @@ import java.util.Objects;
 @Service
 public class AuthenticationService {
 
-    public Long getCurrentUserId(){
+    public Long getCurrentUserId(){ //getting userId from security context for already authenticated object
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserPrincipal userPrincipal = (UserPrincipal) Objects.requireNonNull(authentication).getPrincipal();
         return Objects.requireNonNull(userPrincipal).getUserId();

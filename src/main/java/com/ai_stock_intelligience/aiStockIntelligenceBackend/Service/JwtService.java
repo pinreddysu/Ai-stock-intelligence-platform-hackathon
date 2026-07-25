@@ -42,7 +42,7 @@ public class JwtService {
                 .subject(email)
                 .add("userId", userId)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + (60*60*30)))
+                .expiration(new Date(System.currentTimeMillis() + (1000*60*60*30)))
                 .and()
                 .signWith(getKey()) //Tells algorithm used in generating key
                 .compact(); //build json object by adding subject field, userid field, creation, expiration time, and key and makes it compact
@@ -58,15 +58,15 @@ public class JwtService {
     }
 
     public String extractEmail(String token) {
-        return extractClaims(token, Claims::getSubject);
+        return extractClaims(token, Claims::getSubject); //passing data type for return and asking field that is wanted
     }
 
     public Long extractUserId(String token) {
-        return extractClaims(token, claims -> claims.get("userId", Long.class));
+        return extractClaims(token, claims -> claims.get("userId", Long.class)); //passing Long data type for return and asking what field to extract
     }
 
     public Date extractExpirationDate(String token) {
-        return extractClaims(token,Claims::getExpiration);
+        return extractClaims(token,Claims::getExpiration); //passing of date data type return
     }
 
     public boolean validatingToken(String token, UserDetails userDetails) {
@@ -78,16 +78,16 @@ public class JwtService {
         return extractExpirationDate(token).before(new Date());
     }
 
-    private <T> T extractClaims(String token, Function<Claims, T> claimsResolver){
+    private <T> T extractClaims(String token, Function<Claims, T> claimsResolver){ //need to pass claims for the function and returns any type
         final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        return claimsResolver.apply(claims); //adding claims param here
     }
 
     private Claims extractAllClaims(String token){
         return Jwts.parser()
                 .verifyWith(getKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(token) //breaks here when the token is expired
                 .getPayload();
     }
 }

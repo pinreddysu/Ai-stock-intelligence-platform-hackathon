@@ -39,19 +39,19 @@ public class JwtFilter extends OncePerRequestFilter {
             email = jwtService.extractEmail(token);
             System.out.println(email);
             userId = jwtService.extractUserId(token);
-            System.out.println(userId);
+//            System.out.println(userId);
         }
-
+//checks if it is the credentials provided by user authenticated and there is valid email and userid data from token
         if (email != null && userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = context.getBean(MyUserDetailsService.class).loadUserByUsername(email); //gives email, password, userid, and granted authorities
-            if(jwtService.validatingToken(token, userDetails)){
+            UserDetails userDetails = context.getBean(MyUserDetailsService.class).loadUserByUsername(email); //gives email, password, and granted authorities from db via email passed from token to object
+            if(jwtService.validatingToken(token, userDetails)){ //checks the token valid or not
                 UsernamePasswordAuthenticationToken userAuthToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                userAuthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(userAuthToken);
+                        userDetails, null, userDetails.getAuthorities()); //passes email and password and authorities to create authenticated object
+                userAuthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); //Sets IP and session info
+                SecurityContextHolder.getContext().setAuthentication(userAuthToken); //holds on to this info being authenticated
             }
 
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request,response); //proceed to next filter chain
     }
 }
