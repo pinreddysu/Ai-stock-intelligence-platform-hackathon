@@ -11,8 +11,8 @@ import java.util.List;
 @Repository
 public interface PortfolioHoldingsRepository extends JpaRepository<PortfolioHoldings, Long> {
 
-    boolean existsByPortfolioIdAndStockId(Long portfolioId, Long stockId);
+    boolean existsByUserPortfolioIdAndStocksIdAndUserPortfolioUserId(Long portfolioId, Long stockId, Long userId);
 
-    List<HoldingsDTO> findByPortfolioId(Long id);
+    List<HoldingsDTO> findByUserPortfolioIdAndUserPortfolioUserId(Long portfolioId, Long userId );
 
 }
