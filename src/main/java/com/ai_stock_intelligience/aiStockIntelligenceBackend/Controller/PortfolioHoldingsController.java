@@ -1,8 +1,11 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.HoldingsDTO;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.AddHoldingsToPortfolioDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.GetPortfolioHoldingsDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.PortfolioHoldingsService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +20,7 @@ public class PortfolioHoldingsController {
     private PortfolioHoldingsService portfolioHoldingsService;
 
     @PostMapping("/addStocks")
-    public ResponseEntity<String> addHoldingsToPortfolio(@RequestBody PortfolioHoldings portfolioHoldings){
+    public ResponseEntity<String> addHoldingsToPortfolio(@Valid @RequestBody AddHoldingsToPortfolioDto portfolioHoldings){
         if (portfolioHoldingsService.addHoldings(portfolioHoldings))
             return ResponseEntity.badRequest().body("Stock already exists in this portfolio");
 
@@ -47,7 +50,7 @@ public class PortfolioHoldingsController {
     }
 
     @GetMapping("/getAllHoldings")
-    public ResponseEntity<List<HoldingsDTO>> getAllHoldings(@RequestBody PortfolioHoldings portfolioHoldings){
+    public ResponseEntity<List<HoldingsDTO>> getAllHoldings(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings){
         return ResponseEntity.ok(portfolioHoldingsService.getAllHoldings(portfolioHoldings));
     }
 }
