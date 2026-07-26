@@ -3,6 +3,7 @@ package com.ai_stock_intelligience.aiStockIntelligenceBackend.Service;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.CreatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.UpdatePortfolioRequestDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioInfoDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Users;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserPortfolioRepository;
@@ -48,7 +49,7 @@ public class UserPortfolioService {
         return null;
     }
 
-    public List<UserPortfolio> getListOfPortfoliosByUser() {
+    public List<PortfolioInfoDto> getListOfPortfoliosByUser() {
         Long currentUserId = authenticationService.getCurrentUserId(); //JWt
         return userPortfolioRepository.findByUserIdAndDeletedAtIsNull(currentUserId);
     }
@@ -64,7 +65,8 @@ public class UserPortfolioService {
             }
 
             if (userPortfolio.getDescription() != null) {
-                currentPortfolioInfo.setDescription(userPortfolio.getDescription());
+                currentPortfolioInfo.setDescription(
+                        userPortfolio.getDescription().isBlank() ? null : userPortfolio.getDescription());
             }
 
             return userPortfolioRepository.save(currentPortfolioInfo);
