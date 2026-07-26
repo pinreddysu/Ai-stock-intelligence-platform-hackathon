@@ -36,12 +36,12 @@ public class Stocks {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(name = "updatedAt", nullable = false)
+    @Column(name = "updatedat", nullable = false)
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-//    @OneToOne(mappedBy = "portfolioholdings")
-//    private PortfolioHoldings portfolioHoldings;
+    public Stocks() {
+    }
 
     public Stocks(Long id, String ticker, String companyName, String sector,
                   String exchange, String industry, LocalDateTime createdAt, LocalDateTime updatedAt) {
