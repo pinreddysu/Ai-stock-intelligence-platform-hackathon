@@ -16,12 +16,6 @@ public class PortfolioHoldings {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "portfolioid", nullable = false)
-    private Long portfolioId;
-
-    @Column(name = "stockid", nullable = false, insertable = false, updatable = false)
-    private Long stockId;
-
     @Column(name = "shares", nullable = false)
     private Long shares;
 
@@ -40,11 +34,16 @@ public class PortfolioHoldings {
     @JoinColumn(name = "stockid")
     private Stocks stocks;
 
-    public PortfolioHoldings(Long id, Long portfolioId, Long stockId, Long shares,
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "portfolioid")
+    private UserPortfolio userPortfolio;
+
+    public PortfolioHoldings() {
+    }
+
+    public PortfolioHoldings(Long id, Long shares,
                              Double avgPrice, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
-        this.portfolioId = portfolioId;
-        this.stockId = stockId;
         this.shares = shares;
         this.avgPrice = avgPrice;
         this.createdAt = createdAt;
@@ -57,22 +56,6 @@ public class PortfolioHoldings {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getPortfolioId() {
-        return portfolioId;
-    }
-
-    public void setPortfolioId(Long portfolioId) {
-        this.portfolioId = portfolioId;
-    }
-
-    public Long getStockId() {
-        return stockId;
-    }
-
-    public void setStockId(Long stockId) {
-        this.stockId = stockId;
     }
 
     public Long getShares() {
@@ -105,5 +88,21 @@ public class PortfolioHoldings {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public UserPortfolio getUserPortfolio() {
+        return userPortfolio;
+    }
+
+    public void setUserPortfolio(UserPortfolio userPortfolio) {
+        this.userPortfolio = userPortfolio;
+    }
+
+    public Stocks getStocks() {
+        return stocks;
+    }
+
+    public void setStocks(Stocks stocks) {
+        this.stocks = stocks;
     }
 }
