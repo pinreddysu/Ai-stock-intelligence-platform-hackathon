@@ -1,10 +1,15 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Service;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.HoldingsDTO;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.AddHoldingsToPortfolioDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.GetPortfolioHoldingsDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Stocks;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.PortfolioHoldingsRepository;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.StocksRepository;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserPortfolioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +19,15 @@ public class PortfolioHoldingsService {
 
     @Autowired
     private PortfolioHoldingsRepository portfolioHoldingsRepository;
+
+    @Autowired
+    private AuthenticationService authenticationService;
+
+    @Autowired
+    private UserPortfolioRepository userPortfolioRepository;
+
+    @Autowired
+    private StocksRepository stocksRepository;
 
     public boolean deleteHoldings(PortfolioHoldings portfolioHoldings) {
         if (portfolioHoldingsRepository.existsById(portfolioHoldings.getId())){
@@ -29,11 +43,23 @@ public class PortfolioHoldingsService {
     }
 
 
-    public boolean addHoldings(PortfolioHoldings portfolioHoldings) {
-        if (portfolioHoldingsRepository.existsByPortfolioIdAndStockId(portfolioHoldings.getPortfolioId(),
-                portfolioHoldings.getStockId())){
+    public boolean addHoldings(AddHoldingsToPortfolioDto portfolioHoldingsDetails) {
+        //JWT user retrieval
+        Long currentUserId = authenticationService.getCurrentUserId();
+        if (portfolioHoldingsRepository.existsByUserPortfolioIdAndStocksIdAndUserPortfolioUserId(portfolioHoldingsDetails.getPortfolioId(),
+                portfolioHoldingsDetails.getStockId(), currentUserId)){
             return true;
         }
+
+        UserPortfolio userPortfolio = userPortfolioRepository.findById(portfolioHoldingsDetails.getPortfolioId())
+                .orElseThrow();
+        Stocks stocks = stocksRepository.findById(portfolioHoldingsDetails.getStockId())
+                .orElseThrow();
+        PortfolioHoldings portfolioHoldings = new PortfolioHoldings();
+        portfolioHoldings.setUserPortfolio(userPortfolio);
+        portfolioHoldings.setShares(portfolioHoldingsDetails.getShares());
+        portfolioHoldings.setAvgPrice(portfolioHoldingsDetails.getAvgPrice());
+        portfolioHoldings.setStocks(stocks);
         portfolioHoldingsRepository.save(portfolioHoldings);
         return false;
     }
@@ -55,8 +81,9 @@ public class PortfolioHoldingsService {
         return null;
     }
 
-    public List<HoldingsDTO> getAllHoldings(PortfolioHoldings portfolioHoldings) {
-        System.out.println(portfolioHoldings.getPortfolioId());
-        return portfolioHoldingsRepository.findByPortfolioId(portfolioHoldings.getPortfolioId());
+    public List<HoldingsDTO> getAllHoldings(GetPortfolioHoldingsDto portfolioHoldings) {
+        Long currentUserId = authenticationService.getCurrentUserId();
+        return portfolioHoldingsRepository.findByUserPortfolioIdAndUserPortfolioUserId(
+                portfolioHoldings.getPortfolioId(), currentUserId);
     }
 }
