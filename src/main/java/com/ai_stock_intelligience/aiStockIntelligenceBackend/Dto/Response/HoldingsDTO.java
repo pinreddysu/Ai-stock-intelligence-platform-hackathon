@@ -1,4 +1,4 @@
-package com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto;
+package com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response;
 
 public interface HoldingsDTO {
 
