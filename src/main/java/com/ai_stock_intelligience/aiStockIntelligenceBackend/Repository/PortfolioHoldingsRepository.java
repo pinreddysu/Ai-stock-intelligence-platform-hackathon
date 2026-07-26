@@ -1,6 +1,6 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository;
 
-import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.HoldingsDTO;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.HoldingsDTO;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

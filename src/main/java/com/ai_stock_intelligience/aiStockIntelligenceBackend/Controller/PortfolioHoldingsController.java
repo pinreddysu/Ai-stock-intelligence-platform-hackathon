@@ -1,6 +1,6 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
-import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.HoldingsDTO;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.HoldingsDTO;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.AddHoldingsToPortfolioDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.GetPortfolioHoldingsDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
