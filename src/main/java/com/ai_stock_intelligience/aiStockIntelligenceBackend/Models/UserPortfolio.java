@@ -16,9 +16,6 @@ public class UserPortfolio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "userid", nullable = false)
-    private Long userId;
-
     @Column(name = "portfolioname", nullable = false)
     private String portfolioName;
 
@@ -36,13 +33,16 @@ public class UserPortfolio {
     @Column(name = "deletedat")
     private LocalDateTime deletedAt;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "userid")
+    private Users user;
+
     public UserPortfolio() {
     }
 
-    public UserPortfolio(Long userId, Long id, String portfolioName,
+    public UserPortfolio(Long id, String portfolioName,
                          String description, LocalDateTime createdAt, LocalDateTime updatedAt,
                          LocalDateTime deletedAt) {
-        this.userId = userId;
         this.id = id;
         this.portfolioName = portfolioName;
         this.description = description;
@@ -59,12 +59,12 @@ public class UserPortfolio {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Users getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(Users user) {
+        this.user = user;
     }
 
     public String getPortfolioName() {
