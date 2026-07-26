@@ -42,7 +42,7 @@ public class JwtService {
                 .subject(email)
                 .add("userId", userId)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + (1000*60*60*30)))
+                .expiration(new Date(System.currentTimeMillis() + (1000L*60*60*30)))
                 .and()
                 .signWith(getKey()) //Tells algorithm used in generating key
                 .compact(); //build json object by adding subject field, userid field, creation, expiration time, and key and makes it compact
