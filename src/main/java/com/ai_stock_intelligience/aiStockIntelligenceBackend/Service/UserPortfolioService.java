@@ -4,7 +4,9 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.Create
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.UpdatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Users;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserPortfolioRepository;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,14 +21,19 @@ public class UserPortfolioService {
     @Autowired
     private UserPortfolioRepository userPortfolioRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public boolean createPortfolio(CreatePortfolioRequestDto userPortfolio) {
         Long currentUserId = authenticationService.getCurrentUserId(); //JWt
         if (userPortfolioRepository.existsByPortfolioNameAndUserIdAndDeletedAtIsNotNull(
                 userPortfolio.getPortfolioName(), currentUserId)){
             return true;
         }
+        Users users = userRepository.findById(currentUserId)
+                .orElseThrow();
         UserPortfolio portfolio = new UserPortfolio();
-        portfolio.setUserId(currentUserId);
+        portfolio.setUser(users);
         portfolio.setPortfolioName(userPortfolio.getPortfolioName());
         portfolio.setDescription(userPortfolio.getDescription());
         userPortfolioRepository.save(portfolio);
