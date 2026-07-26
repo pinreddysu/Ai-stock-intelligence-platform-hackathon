@@ -27,7 +27,7 @@ public class UserPortfolioService {
 
     public boolean createPortfolio(CreatePortfolioRequestDto userPortfolio) {
         Long currentUserId = authenticationService.getCurrentUserId(); //JWt
-        if (userPortfolioRepository.existsByPortfolioNameAndUserIdAndDeletedAtIsNotNull(
+        if (userPortfolioRepository.existsByPortfolioNameAndUserIdAndDeletedAtIsNull(
                 userPortfolio.getPortfolioName(), currentUserId)){
             return true;
         }
@@ -60,7 +60,10 @@ public class UserPortfolioService {
         UserPortfolio currentPortfolioInfo = userPortfolioRepository.findByIdAndUserIdAndDeletedAtIsNull(userPortfolio.getId(), currentUserId);
 
         if (currentPortfolioInfo != null) {
-            if (userPortfolio.getPortfolioName() != null) {
+            if (userPortfolio.getPortfolioName() != null &&
+                    !userPortfolioRepository.existsByPortfolioNameAndUserIdAndDeletedAtIsNull(
+                    userPortfolio.getPortfolioName(), currentUserId) &&
+                    !userPortfolio.getPortfolioName().equalsIgnoreCase(currentPortfolioInfo.getPortfolioName())) {
                 currentPortfolioInfo.setPortfolioName(userPortfolio.getPortfolioName());
             }
 

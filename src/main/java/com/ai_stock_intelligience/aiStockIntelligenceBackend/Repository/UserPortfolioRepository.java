@@ -26,4 +26,5 @@ public interface UserPortfolioRepository extends JpaRepository<UserPortfolio, Lo
 
     UserPortfolio findByIdAndUserIdAndDeletedAtIsNull(Long id, Long userId);
 
+    boolean existsByPortfolioNameAndUserIdAndDeletedAtIsNull(String portfolioName, Long currentUserId);
 }
