@@ -34,7 +34,7 @@ public class UserPortfolio {
     private LocalDateTime deletedAt;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "userid", nullable = false)
     private Users user;
 
     public UserPortfolio() {

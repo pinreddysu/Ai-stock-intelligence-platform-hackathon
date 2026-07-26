@@ -31,11 +31,11 @@ public class PortfolioHoldings {
     private LocalDateTime updatedAt;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "stockid")
+    @JoinColumn(name = "stockid", nullable = false)
     private Stocks stocks;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "portfolioid")
+    @JoinColumn(name = "portfolioid", nullable = false)
     private UserPortfolio userPortfolio;
 
     public PortfolioHoldings() {
