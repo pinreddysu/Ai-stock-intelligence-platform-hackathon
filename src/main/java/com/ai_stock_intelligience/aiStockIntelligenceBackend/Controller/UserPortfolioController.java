@@ -3,6 +3,7 @@ package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.CreatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.UpdatePortfolioRequestDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioInfoDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.UserPortfolioService;
 import jakarta.validation.Valid;
@@ -28,21 +29,20 @@ public class UserPortfolioController {
     }
 
     @GetMapping("/myPortfolios")
-    public ResponseEntity<List<UserPortfolio>> getListOfPortfoliosByUser(){
+    public ResponseEntity<List<PortfolioInfoDto>> getListOfPortfoliosByUser(){
         return ResponseEntity.ok(userPortfolioService.getListOfPortfoliosByUser());
     }
 
     @PatchMapping("/editPortfolioDetails")
-    public ResponseEntity<UserPortfolio> updatePortfolioById(@Valid @RequestBody UpdatePortfolioRequestDto userPortfolio){
+    public ResponseEntity<String> updatePortfolioById(@Valid @RequestBody UpdatePortfolioRequestDto userPortfolio){
         UserPortfolio updatedUserPortfolio = userPortfolioService.updatePortfolioDetails(userPortfolio);
         if (updatedUserPortfolio != null) {
-            return ResponseEntity.ok(updatedUserPortfolio);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Portfolio is updated");
         }
         else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Portfolio could not be updated");
         }
     }
-
 
     @PatchMapping("/deletePortfolio")
     public ResponseEntity<String> deletePortfolio(@Valid @RequestBody DeletePortfolioRequestDto userPortfolio){
