@@ -17,7 +17,7 @@ public class PortfolioHoldings {
     private Long id;
 
     @Column(name = "shares", nullable = false)
-    private Long shares;
+    private Double shares;
 
     @Column(name = "avgprice", nullable = false)
     private Double avgPrice;
@@ -30,6 +30,9 @@ public class PortfolioHoldings {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Column(name = "deletedat")
+    private LocalDateTime deletedAt;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "stockid", nullable = false)
     private Stocks stocks;
@@ -41,8 +44,8 @@ public class PortfolioHoldings {
     public PortfolioHoldings() {
     }
 
-    public PortfolioHoldings(Long id, Long shares,
-                             Double avgPrice, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public PortfolioHoldings(Long id, Double shares,
+                             Double avgPrice, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt) {
         this.id = id;
         this.shares = shares;
         this.avgPrice = avgPrice;
@@ -58,11 +61,11 @@ public class PortfolioHoldings {
         this.id = id;
     }
 
-    public Long getShares() {
+    public Double getShares() {
         return shares;
     }
 
-    public void setShares(Long shares) {
+    public void setShares(Double shares) {
         this.shares = shares;
     }
 
@@ -88,6 +91,14 @@ public class PortfolioHoldings {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
     public UserPortfolio getUserPortfolio() {
