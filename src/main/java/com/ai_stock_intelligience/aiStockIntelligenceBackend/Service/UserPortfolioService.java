@@ -2,6 +2,7 @@ package com.ai_stock_intelligience.aiStockIntelligenceBackend.Service;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.CreatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfolioRequestDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfoliosListRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.UpdatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioInfoDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
@@ -11,6 +12,7 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserRepo
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -41,12 +43,18 @@ public class UserPortfolioService {
         return false;
     }
 
-    public Long deletePortfolio(DeletePortfolioRequestDto userPortfolio){
+    public boolean deletePortfolio(DeletePortfolioRequestDto userPortfolio){
         Long currentUserId = authenticationService.getCurrentUserId(); //JWT
-        if (userPortfolioRepository.existsByIdAndUserIdAndDeletedAtIsNull(userPortfolio.getId(), currentUserId)){
-            return userPortfolioRepository.deletePortfolio(userPortfolio.getId());
+
+        UserPortfolio portfolio = userPortfolioRepository.findByIdAndUserIdAndDeletedAtIsNull(userPortfolio.getId(), currentUserId);
+
+        if (portfolio == null){
+            return false;
         }
-        return null;
+
+        portfolio.setDeletedAt(LocalDateTime.now());
+        userPortfolioRepository.save(portfolio);
+        return true;
     }
 
     public List<PortfolioInfoDto> getListOfPortfoliosByUser() {
@@ -77,5 +85,19 @@ public class UserPortfolioService {
         else {
             return null;
         }
+    }
+
+    public boolean deletePorfoliosList(DeletePortfoliosListRequestDto portfoliosList) {
+        Long currentUserId = authenticationService.getCurrentUserId(); //JWT
+        List<UserPortfolio> existingPortfolio = userPortfolioRepository.findAllByIdInAndUserIdAndDeletedAtIsNull(
+                portfoliosList.getIds(), currentUserId);
+        if (existingPortfolio != null){
+            for (UserPortfolio portfolio: existingPortfolio){
+                portfolio.setDeletedAt(LocalDateTime.now());
+            }
+            userPortfolioRepository.saveAll(existingPortfolio);
+            return true;
+        }
+        return false;
     }
 }
