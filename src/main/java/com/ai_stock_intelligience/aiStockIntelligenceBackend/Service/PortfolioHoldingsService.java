@@ -63,7 +63,9 @@ public class PortfolioHoldingsService {
     public boolean addHoldings(AddHoldingsToPortfolioDto portfolioHoldingsDetails) {
         //JWT user retrieval
         Long currentUserId = authenticationService.getCurrentUserId();
-        if (portfolioHoldingsRepository.existsByUserPortfolioIdAndStocksIdAndUserPortfolioUserId(portfolioHoldingsDetails.getPortfolioId(),
+        if (portfolioHoldingsRepository
+                .existsByUserPortfolioIdAndStocksIdAndUserPortfolioUserIdAndDeletedAtIsNull
+                        (portfolioHoldingsDetails.getPortfolioId(),
                 portfolioHoldingsDetails.getStockId(), currentUserId)){
             return true;
         }
