@@ -8,13 +8,13 @@ public interface HoldingsDTO {
 
     Double getAvgPrice();
 
-    String getStocksTicker();
+    StocksDTO getStocks();
 
-    String getStocksCompanyName();
-
-    String getStocksSector();
-
-    String getStocksExchange();
-
-    String getStocksIndustry();
+    interface StocksDTO {
+        String getTicker();
+        String getCompanyName();
+        String getSector();
+        String getExchange();
+        String getIndustry();
+    }
 }
