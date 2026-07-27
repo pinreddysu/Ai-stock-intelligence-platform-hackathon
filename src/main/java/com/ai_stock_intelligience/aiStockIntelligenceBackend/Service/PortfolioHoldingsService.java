@@ -64,16 +64,16 @@ public class PortfolioHoldingsService {
         return false;
     }
 
-    public PortfolioHoldings updateHoldings(PortfolioHoldings portfolioHoldings) {
+    public PortfolioHoldings updateHoldings(UpdateHoldingRequestDto portfolioHoldings) {
         PortfolioHoldings existingPortfolioHoldings = portfolioHoldingsRepository
-                .findById(portfolioHoldings.getId())
-                .orElse(null);
+                .findByIdAndUserPortfolioUserIdAndDeletedAtIsNull(portfolioHoldings.getId(),
+                        authenticationService.getCurrentUserId());
 
         if (existingPortfolioHoldings != null) {
-            if(portfolioHoldings.getAvgPrice() >= 0) {
+            if(portfolioHoldings.getAvgPrice() != null) {
                 existingPortfolioHoldings.setAvgPrice(portfolioHoldings.getAvgPrice());
             }
-            if(portfolioHoldings.getShares() >= 0) {
+            if(portfolioHoldings.getShares() != null) {
                 existingPortfolioHoldings.setShares(portfolioHoldings.getShares());
             }
             return portfolioHoldingsRepository.save(existingPortfolioHoldings);
