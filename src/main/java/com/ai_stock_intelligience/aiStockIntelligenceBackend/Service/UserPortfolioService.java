@@ -100,4 +100,9 @@ public class UserPortfolioService {
         }
         return false;
     }
+
+    public List<PortfolioInfoDto> filterPortfoliosByNameByUser(String keyword) {
+        Long currentUserId = authenticationService.getCurrentUserId();
+        return userPortfolioRepository.filterSearchPortfoliosByNameByUser(keyword, currentUserId);
+    }
 }
