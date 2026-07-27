@@ -44,9 +44,9 @@ public class UserPortfolioController {
         }
     }
 
-    @PatchMapping("/deletePortfolio")
+    @DeleteMapping("/deletePortfolio")
     public ResponseEntity<String> deletePortfolio(@Valid @RequestBody DeletePortfolioRequestDto userPortfolio){
-        if(userPortfolioService.deletePortfolio(userPortfolio) != null){
+        if(userPortfolioService.deletePortfolio(userPortfolio)){
             return ResponseEntity.ok("Portfolio deleted");
         }
         else {
