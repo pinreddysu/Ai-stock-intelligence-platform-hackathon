@@ -70,8 +70,8 @@ public class PortfolioHoldingsService {
             return true;
         }
 
-        UserPortfolio userPortfolio = userPortfolioRepository.findById(portfolioHoldingsDetails.getPortfolioId())
-                .orElseThrow();
+        UserPortfolio userPortfolio = userPortfolioRepository.findByIdAndUserIdAndDeletedAtIsNull(
+                portfolioHoldingsDetails.getPortfolioId(), currentUserId);
         Stocks stocks = stocksRepository.findById(portfolioHoldingsDetails.getStockId())
                 .orElseThrow();
         PortfolioHoldings portfolioHoldings = new PortfolioHoldings();
