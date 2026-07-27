@@ -2,6 +2,7 @@ package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.CreatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfolioRequestDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfoliosListRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.UpdatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioInfoDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
@@ -52,5 +53,13 @@ public class UserPortfolioController {
         else {
             return ResponseEntity.badRequest().body("Portfolio does not exist or has been already deleted");
         }
+    }
+
+    @DeleteMapping("/deletePortfoliosList")
+    public ResponseEntity<String> deletePortfoliosList(@Valid @RequestBody DeletePortfoliosListRequestDto portfoliosList){
+        if(userPortfolioService.deletePorfoliosList(portfoliosList)){
+            return ResponseEntity.ok("Portfolios deleted");
+        }
+        return ResponseEntity.badRequest().body("List of portfolios could not be deleted");
     }
 }
