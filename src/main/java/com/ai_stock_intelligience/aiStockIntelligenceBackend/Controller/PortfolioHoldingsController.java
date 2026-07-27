@@ -1,8 +1,7 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.*;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.HoldingsDTO;
-import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.AddHoldingsToPortfolioDto;
-import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.GetPortfolioHoldingsDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.PortfolioHoldingsService;
 import jakarta.validation.Valid;
@@ -28,12 +27,12 @@ public class PortfolioHoldingsController {
     }
 
     @PatchMapping("/updateHoldings")
-    public ResponseEntity<PortfolioHoldings> updateHoldings(@RequestBody PortfolioHoldings portfolioHoldings) {
+    public ResponseEntity<String> updateHoldings(@Valid @RequestBody UpdateHoldingRequestDto portfolioHoldings) {
         PortfolioHoldings updatedPortfolioHoldings = portfolioHoldingsService.updateHoldings(portfolioHoldings);
         if (updatedPortfolioHoldings != null)
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedPortfolioHoldings);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Holding has been updated");
         else
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Holding could not be updated");
     }
 
     @DeleteMapping("/removeHoldings")
