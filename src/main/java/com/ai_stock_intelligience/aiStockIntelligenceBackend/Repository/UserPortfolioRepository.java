@@ -25,4 +25,13 @@ public interface UserPortfolioRepository extends JpaRepository<UserPortfolio, Lo
     boolean existsByPortfolioNameAndUserIdAndDeletedAtIsNull(String portfolioName, Long currentUserId);
 
     List<UserPortfolio> findAllByIdInAndUserIdAndDeletedAtIsNull(List<Long> portfoliosList, Long currentUserId);
+
+    @Query(
+            """
+                    SELECT u FROM UserPortfolio u WHERE LOWER(u.portfolioName)
+                    LIKE LOWER(CONCAT('%', :keyword, '%')) AND u.user.id = :currentUserId
+                    AND u.deletedAt IS NULL"""
+    )
+    List<PortfolioInfoDto> filterSearchPortfoliosByNameByUser(@Param("keyword") String keyword,
+                                                              @Param("currentUserId") Long currentUserId);
 }
