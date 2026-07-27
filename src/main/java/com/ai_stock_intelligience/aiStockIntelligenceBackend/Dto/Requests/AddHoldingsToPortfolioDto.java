@@ -15,7 +15,7 @@ public class AddHoldingsToPortfolioDto {
     private Long stockId;
 
     @PositiveOrZero(message = "Shares has to be greater than or equal to 0")
-    private Long shares;
+    private Double shares;
 
     @PositiveOrZero(message = "Average Price has to be greater than or equal to 0")
     private Double avgPrice;
@@ -36,11 +36,11 @@ public class AddHoldingsToPortfolioDto {
         this.portfolioId = portfolioId;
     }
 
-    public Long getShares() {
+    public Double getShares() {
         return shares;
     }
 
-    public void setShares(Long shares) {
+    public void setShares(Double shares) {
         this.shares = shares;
     }
 
