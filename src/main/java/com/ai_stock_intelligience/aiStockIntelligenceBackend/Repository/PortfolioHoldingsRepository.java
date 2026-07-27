@@ -4,14 +4,13 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.Holdin
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 
 @Repository
 public interface PortfolioHoldingsRepository extends JpaRepository<PortfolioHoldings, Long> {
 
-    boolean existsByUserPortfolioIdAndStocksIdAndUserPortfolioUserId(Long portfolioId, Long stockId, Long userId);
+    boolean existsByUserPortfolioIdAndStocksIdAndUserPortfolioUserIdAndDeletedAtIsNull(Long portfolioId, Long stockId, Long userId);
 
     List<HoldingsDTO> findByUserPortfolioIdAndUserPortfolioUserId(Long portfolioId, Long userId );
 
