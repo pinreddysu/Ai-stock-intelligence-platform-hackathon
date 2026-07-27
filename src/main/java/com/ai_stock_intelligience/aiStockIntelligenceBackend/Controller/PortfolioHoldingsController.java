@@ -49,8 +49,16 @@ public class PortfolioHoldingsController {
         return ResponseEntity.internalServerError().body("List of holdings could not be deleted");
     }
 
+//    @GetMapping("/getAllHoldings")
+//    public ResponseEntity<List<HoldingsDTO>> getAllHoldings(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings){
+//        return ResponseEntity.ok(portfolioHoldingsService.getAllHoldings(portfolioHoldings));
+//    }
+
     @GetMapping("/getAllHoldings")
-    public ResponseEntity<List<HoldingsDTO>> getAllHoldings(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings){
+    public ResponseEntity<List<HoldingsDTO>> filterPortfoliosByNameByUser(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings, @RequestParam(required = false) String keyword){
+        if (keyword != null) {
+           return ResponseEntity.ok(portfolioHoldingsService.filterSearchHoldings(portfolioHoldings, keyword));
+        }
         return ResponseEntity.ok(portfolioHoldingsService.getAllHoldings(portfolioHoldings));
     }
 }
