@@ -43,9 +43,10 @@ public class PortfolioHoldingsController {
     }
 
     @DeleteMapping("/removeListOfHoldings")
-    public ResponseEntity<String> deleteListOfHoldings(@RequestBody List<PortfolioHoldings> portfolioHoldingsList){
-        portfolioHoldingsService.deleteListOfHoldings(portfolioHoldingsList);
-        return ResponseEntity.ok("List of holdings have been deleted");
+    public ResponseEntity<String> deleteListOfHoldings(@Valid @RequestBody RemoveHoldingsListRequestDto portfolioHoldingsIds){
+        if(portfolioHoldingsService.deleteListOfHoldings(portfolioHoldingsIds))
+            return ResponseEntity.ok("List of holdings have been deleted");
+        return ResponseEntity.internalServerError().body("List of holdings could not be deleted");
     }
 
     @GetMapping("/getAllHoldings")
