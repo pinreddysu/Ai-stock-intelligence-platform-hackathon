@@ -36,7 +36,7 @@ public class PortfolioHoldingsController {
     }
 
     @DeleteMapping("/removeHoldings")
-    public ResponseEntity<String> deleteHoldings(@RequestBody PortfolioHoldings portfolioHoldings) {
+    public ResponseEntity<String> deleteHoldings(@Valid @RequestBody RemoveHoldingRequestDto portfolioHoldings) {
         if (portfolioHoldingsService.deleteHoldings(portfolioHoldings))
             return ResponseEntity.ok("Stock has been removed");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Holding does not exist to delete it");
