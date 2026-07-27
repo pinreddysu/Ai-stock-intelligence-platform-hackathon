@@ -1,8 +1,7 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Service;
 
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.*;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.HoldingsDTO;
-import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.AddHoldingsToPortfolioDto;
-import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.GetPortfolioHoldingsDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Stocks;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
@@ -12,6 +11,7 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserPort
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -43,8 +43,20 @@ public class PortfolioHoldingsService {
             return false;
     }
 
-    public void deleteListOfHoldings(List<PortfolioHoldings> portfolioHoldingsList) {
-        portfolioHoldingsRepository.deleteAll(portfolioHoldingsList);
+    public boolean deleteListOfHoldings(RemoveHoldingsListRequestDto portfolioHoldingsList) {
+        List<PortfolioHoldings> listOfHoldings = portfolioHoldingsRepository
+                .findAllByIdInAndUserPortfolioUserIdAndDeletedAtIsNull(portfolioHoldingsList.getIds(), authenticationService.getCurrentUserId());
+
+        if (listOfHoldings.isEmpty()){
+            return false;
+        }
+
+        for (PortfolioHoldings holding: listOfHoldings){
+            holding.setDeletedAt(LocalDateTime.now());
+        }
+
+        portfolioHoldingsRepository.saveAll(listOfHoldings);
+        return true;
     }
 
 
