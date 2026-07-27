@@ -105,4 +105,9 @@ public class PortfolioHoldingsService {
         return portfolioHoldingsRepository.findByUserPortfolioIdAndUserPortfolioUserId(
                 portfolioHoldings.getPortfolioId(), currentUserId);
     }
+
+    public List<HoldingsDTO> filterSearchHoldings(GetPortfolioHoldingsDto portfolioHoldings, String keyword) {
+        Long currentUserId = authenticationService.getCurrentUserId();
+        return portfolioHoldingsRepository.filterSearchHoldings(portfolioHoldings.getPortfolioId(), keyword, currentUserId);
+    }
 }
