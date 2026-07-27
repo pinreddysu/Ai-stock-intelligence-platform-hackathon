@@ -29,8 +29,16 @@ public class UserPortfolioController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Portfolio is created");
     }
 
+//    @GetMapping("/myPortfolios")
+//    public ResponseEntity<List<PortfolioInfoDto>> getListOfPortfoliosByUser(){
+//        return ResponseEntity.ok(userPortfolioService.getListOfPortfoliosByUser());
+//    }
+
     @GetMapping("/myPortfolios")
-    public ResponseEntity<List<PortfolioInfoDto>> getListOfPortfoliosByUser(){
+    public ResponseEntity<List<PortfolioInfoDto>> getListOfPortfoliosByUser(@RequestParam(required = false) String keyword){
+        if(keyword != null){
+            return ResponseEntity.ok(userPortfolioService.filterPortfoliosByNameByUser(keyword));
+        }
         return ResponseEntity.ok(userPortfolioService.getListOfPortfoliosByUser());
     }
 
