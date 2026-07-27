@@ -15,4 +15,7 @@ public interface PortfolioHoldingsRepository extends JpaRepository<PortfolioHold
 
     List<HoldingsDTO> findByUserPortfolioIdAndUserPortfolioUserId(Long portfolioId, Long userId );
 
+    PortfolioHoldings findByIdAndUserPortfolioUserIdAndDeletedAtIsNull(Long id, Long userId);
+
+    List<PortfolioHoldings> findAllByIdInAndUserPortfolioUserIdAndDeletedAtIsNull(List<Long> portfolioHoldingsList, Long currentUserId);
 }
