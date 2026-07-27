@@ -29,13 +29,18 @@ public class PortfolioHoldingsService {
     @Autowired
     private StocksRepository stocksRepository;
 
-    public boolean deleteHoldings(PortfolioHoldings portfolioHoldings) {
-        if (portfolioHoldingsRepository.existsById(portfolioHoldings.getId())){
-            portfolioHoldingsRepository.delete(portfolioHoldings);
-//            portfolioHoldingsRepository.deleteById(portfolioHoldings.getId());
-            return true;
-        }
-        return false;
+
+    public boolean deleteHoldings(RemoveHoldingRequestDto portfolioHoldings) {
+        PortfolioHoldings existingPortfolioHoldings = portfolioHoldingsRepository
+                .findByIdAndUserPortfolioUserIdAndDeletedAtIsNull(portfolioHoldings.getId(),
+                        authenticationService.getCurrentUserId());
+        if(existingPortfolioHoldings != null
+                && existingPortfolioHoldings.getDeletedAt() == null){
+                    existingPortfolioHoldings.setDeletedAt(LocalDateTime.now());
+                    portfolioHoldingsRepository.save(existingPortfolioHoldings);
+                    return true;
+            }
+            return false;
     }
 
     public void deleteListOfHoldings(List<PortfolioHoldings> portfolioHoldingsList) {
