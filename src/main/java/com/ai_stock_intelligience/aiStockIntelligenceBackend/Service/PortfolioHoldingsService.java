@@ -8,7 +8,6 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfoli
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.PortfolioHoldingsRepository;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.StocksRepository;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserPortfolioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
