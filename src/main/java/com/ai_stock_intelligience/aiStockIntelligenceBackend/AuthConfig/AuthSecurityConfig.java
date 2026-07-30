@@ -2,7 +2,6 @@ package com.ai_stock_intelligience.aiStockIntelligenceBackend.AuthConfig;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Constants.UserConstants;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.MyUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -22,11 +21,14 @@ import org.springframework.stereotype.Component;
 @EnableWebSecurity
 public class AuthSecurityConfig {
 
-    @Autowired
-    private MyUserDetailsService userDetailsService; //verifies username and password
+    private final MyUserDetailsService userDetailsService; //verifies username and password
 
-    @Autowired
-    private JwtFilter jwtFilter;
+    private final JwtFilter jwtFilter;
+
+    public AuthSecurityConfig(MyUserDetailsService userDetailsService, JwtFilter jwtFilter) {
+        this.userDetailsService = userDetailsService;
+        this.jwtFilter = jwtFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
