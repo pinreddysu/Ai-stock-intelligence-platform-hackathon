@@ -32,7 +32,7 @@ public class AuthSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers("/Create", "/Login", "/getStocks")
+                request.requestMatchers("/Create", "/Login", "/getStocks", "/getStockDetails")
                         .permitAll()
                         .anyRequest().authenticated());
 //        httpSecurity.formLogin(Customizer.withDefaults()); //for webpage
