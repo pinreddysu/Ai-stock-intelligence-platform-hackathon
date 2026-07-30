@@ -17,18 +17,23 @@ import java.util.List;
 @Service
 public class PortfolioHoldingsService {
 
-    @Autowired
-    private PortfolioHoldingsRepository portfolioHoldingsRepository;
+    private final PortfolioHoldingsRepository portfolioHoldingsRepository;
 
-    @Autowired
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
-    @Autowired
-    private UserPortfolioRepository userPortfolioRepository;
+    private final UserPortfolioRepository userPortfolioRepository;
 
-    @Autowired
-    private StocksRepository stocksRepository;
+    private final StocksRepository stocksRepository;
 
+    public PortfolioHoldingsService(PortfolioHoldingsRepository portfolioHoldingsRepository,
+                                    AuthenticationService authenticationService,
+                                    UserPortfolioRepository userPortfolioRepository,
+                                    StocksRepository stocksRepository) {
+        this.portfolioHoldingsRepository = portfolioHoldingsRepository;
+        this.authenticationService = authenticationService;
+        this.userPortfolioRepository = userPortfolioRepository;
+        this.stocksRepository = stocksRepository;
+    }
 
     public boolean deleteHoldings(RemoveHoldingRequestDto portfolioHoldings) {
         PortfolioHoldings existingPortfolioHoldings = portfolioHoldingsRepository

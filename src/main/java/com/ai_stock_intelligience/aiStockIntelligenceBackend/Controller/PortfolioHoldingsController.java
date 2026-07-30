@@ -5,7 +5,6 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.Holdin
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.PortfolioHoldingsService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +14,11 @@ import java.util.List;
 @RestController
 public class PortfolioHoldingsController {
 
-    @Autowired
-    private PortfolioHoldingsService portfolioHoldingsService;
+    private final PortfolioHoldingsService portfolioHoldingsService;
+
+    public PortfolioHoldingsController(PortfolioHoldingsService portfolioHoldingsService) {
+        this.portfolioHoldingsService = portfolioHoldingsService;
+    }
 
     @PostMapping("/addStocks")
     public ResponseEntity<String> addHoldingsToPortfolio(@Valid @RequestBody AddHoldingsToPortfolioDto portfolioHoldings){
