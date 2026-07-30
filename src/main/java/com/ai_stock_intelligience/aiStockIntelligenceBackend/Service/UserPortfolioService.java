@@ -9,7 +9,6 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfoli
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Users;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserPortfolioRepository;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,14 +17,19 @@ import java.util.List;
 @Service
 public class UserPortfolioService {
 
-    @Autowired
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
-    @Autowired
-    private UserPortfolioRepository userPortfolioRepository;
+    private final UserPortfolioRepository userPortfolioRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public UserPortfolioService(AuthenticationService authenticationService,
+                                UserPortfolioRepository userPortfolioRepository,
+                                UserRepository userRepository) {
+        this.authenticationService = authenticationService;
+        this.userPortfolioRepository = userPortfolioRepository;
+        this.userRepository = userRepository;
+    }
 
     public boolean createPortfolio(CreatePortfolioRequestDto userPortfolio) {
         Long currentUserId = authenticationService.getCurrentUserId(); //JWt

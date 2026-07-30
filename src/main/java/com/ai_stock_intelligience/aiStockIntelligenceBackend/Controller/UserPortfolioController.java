@@ -8,7 +8,6 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.Portfo
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.UserPortfolioService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +17,11 @@ import java.util.List;
 @RestController
 public class UserPortfolioController {
 
-    @Autowired
-    private UserPortfolioService userPortfolioService;
+    private final UserPortfolioService userPortfolioService;
+
+    public UserPortfolioController(UserPortfolioService userPortfolioService) {
+        this.userPortfolioService = userPortfolioService;
+    }
 
     @PostMapping("/createPortfolio")
     public ResponseEntity<String> createPortfolio(@Valid @RequestBody CreatePortfolioRequestDto userPortfolio){
