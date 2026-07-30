@@ -6,7 +6,6 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.Regist
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Users;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Projections.AuthenticationUserIdProjection;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,16 +15,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserAuthService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+    final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(UserConstants.encryptionStrength);
+
+    public UserAuthService(UserRepository userRepository, JwtService jwtService,
+                           AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+    }
 
     public Users createAccount(RegisterRequestDto user){
        Users users = new Users();
