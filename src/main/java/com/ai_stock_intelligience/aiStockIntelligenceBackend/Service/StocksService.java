@@ -25,4 +25,11 @@ public class StocksService {
     public Page<BasicStockDto> getStocksListWithSearch(String keyword, Pageable pageable) {
         return stocksRepo.getStocksList(keyword, pageable);
     }
+
+    public StocksDto getStocksDetails(String ticker){
+        StocksDto stocks = stocksRepo.findStockDetailsByTicker(ticker);
+        if (stocks.getExchange() == null)
+            importStocksDetailsService.importDetailsByTicker(ticker);
+        return stocks;
+    }
 }
