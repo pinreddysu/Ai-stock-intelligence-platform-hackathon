@@ -5,6 +5,7 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.Delete
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfoliosListRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.UpdatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioInfoDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioValueUpdateRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.UserPortfolioService;
 import jakarta.validation.Valid;
@@ -31,17 +32,14 @@ public class UserPortfolioController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Portfolio is created");
     }
 
-//    @GetMapping("/myPortfolios")
-//    public ResponseEntity<List<PortfolioInfoDto>> getListOfPortfoliosByUser(){
-//        return ResponseEntity.ok(userPortfolioService.getListOfPortfoliosByUser());
-//    }
-
     @GetMapping("/myPortfolios")
     public ResponseEntity<List<PortfolioInfoDto>> getListOfPortfoliosByUser(@RequestParam(required = false) String keyword){
-        if(keyword != null){
-            return ResponseEntity.ok(userPortfolioService.filterPortfoliosByNameByUser(keyword));
-        }
-        return ResponseEntity.ok(userPortfolioService.getListOfPortfoliosByUser());
+        return ResponseEntity.ok(userPortfolioService.getListOfPortfoliosByUser(keyword));
+    }
+
+    @GetMapping("/myPortfolios/refresh")
+    public ResponseEntity<PortfolioValueUpdateRequestDto> updatePortfolioValueByUser(@RequestParam Long portfolioId){
+        return ResponseEntity.ok(userPortfolioService.getUpdatedPortfolioValue(portfolioId));
     }
 
     @PatchMapping("/editPortfolioDetails")
@@ -67,7 +65,7 @@ public class UserPortfolioController {
 
     @DeleteMapping("/deletePortfoliosList")
     public ResponseEntity<String> deletePortfoliosList(@Valid @RequestBody DeletePortfoliosListRequestDto portfoliosList){
-        if(userPortfolioService.deletePorfoliosList(portfoliosList)){
+        if(userPortfolioService.deletePortfoliosList(portfoliosList)){
             return ResponseEntity.ok("Portfolios deleted");
         }
         return ResponseEntity.badRequest().body("List of portfolios could not be deleted");
