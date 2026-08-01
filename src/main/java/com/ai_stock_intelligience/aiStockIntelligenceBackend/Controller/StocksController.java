@@ -16,8 +16,11 @@ import java.util.List;
 @RestController
 public class StocksController {
 
-    @Autowired
-    private StocksService stocks;
+    private final StocksService stocks;
+
+    public StocksController(StocksService stocks) {
+        this.stocks = stocks;
+    }
 
     @GetMapping("/getStocks")
     public ResponseEntity<Page<StocksDto>> getStocksList(
