@@ -91,7 +91,7 @@ public class UserPortfolioService {
         }
     }
 
-    public boolean deletePorfoliosList(DeletePortfoliosListRequestDto portfoliosList) {
+    public boolean deletePortfoliosList(DeletePortfoliosListRequestDto portfoliosList) {
         Long currentUserId = authenticationService.getCurrentUserId(); //JWT
         List<UserPortfolio> existingPortfolio = userPortfolioRepository.findAllByIdInAndUserIdAndDeletedAtIsNull(
                 portfoliosList.getIds(), currentUserId);
