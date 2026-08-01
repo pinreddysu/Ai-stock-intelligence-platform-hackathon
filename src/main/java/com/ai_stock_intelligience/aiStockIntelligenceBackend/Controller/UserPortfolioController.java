@@ -5,7 +5,7 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.Delete
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.DeletePortfoliosListRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.UpdatePortfolioRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioInfoDto;
-import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioValueUpdateRequestDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioValueUpdateDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.UserPortfolioService;
 import jakarta.validation.Valid;
@@ -38,7 +38,7 @@ public class UserPortfolioController {
     }
 
     @GetMapping("/myPortfolios/refresh")
-    public ResponseEntity<PortfolioValueUpdateRequestDto> updatePortfolioValueByUser(@RequestParam Long portfolioId){
+    public ResponseEntity<PortfolioValueUpdateDto> updatePortfolioValueByUser(@RequestParam Long portfolioId){
         return ResponseEntity.ok(userPortfolioService.getUpdatedPortfolioValue(portfolioId));
     }
 
