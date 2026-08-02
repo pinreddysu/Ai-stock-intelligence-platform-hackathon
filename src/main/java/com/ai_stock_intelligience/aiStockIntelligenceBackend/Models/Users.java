@@ -1,6 +1,5 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Models;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
