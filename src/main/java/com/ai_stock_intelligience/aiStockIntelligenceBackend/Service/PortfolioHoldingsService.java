@@ -1,7 +1,8 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Service;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.*;
-import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.HoldingsDTO;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioDetailsDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioValueAndUpdatedAtDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Stocks;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
@@ -11,6 +12,7 @@ import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserPort
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -24,14 +26,18 @@ public class PortfolioHoldingsService {
 
     private final StocksRepository stocksRepository;
 
+    private final ImportStockPriceService stockCurrentPricesService;
+
     public PortfolioHoldingsService(PortfolioHoldingsRepository portfolioHoldingsRepository,
                                     AuthenticationService authenticationService,
                                     UserPortfolioRepository userPortfolioRepository,
-                                    StocksRepository stocksRepository) {
+                                    StocksRepository stocksRepository,
+                                    ImportStockPriceService stockCurrentPricesService) {
         this.portfolioHoldingsRepository = portfolioHoldingsRepository;
         this.authenticationService = authenticationService;
         this.userPortfolioRepository = userPortfolioRepository;
         this.stocksRepository = stocksRepository;
+        this.stockCurrentPricesService = stockCurrentPricesService;
     }
 
     public boolean deleteHoldings(RemoveHoldingRequestDto portfolioHoldings) {
@@ -104,14 +110,89 @@ public class PortfolioHoldingsService {
         return null;
     }
 
-    public List<HoldingsDTO> getAllHoldings(GetPortfolioHoldingsDto portfolioHoldings) {
+    public PortfolioDetailsDto portfolioSummary(GetPortfolioHoldingsDto portfolioHoldings, String keyword, boolean refresh){
         Long currentUserId = authenticationService.getCurrentUserId();
-        return portfolioHoldingsRepository.findByUserPortfolioIdAndUserPortfolioUserId(
+        UserPortfolio portfolioInfo = userPortfolioRepository.findByIdAndUserIdAndDeletedAtIsNull(
                 portfolioHoldings.getPortfolioId(), currentUserId);
+        PortfolioDetailsDto portfolioSummary = new PortfolioDetailsDto(portfolioInfo.getPortfolioName(),
+                portfolioInfo.getId(), portfolioInfo.getDescription());
+        portfolioSummary.setHoldingsDto(portfolioHoldingsRepository.getPortfolioHoldings(portfolioInfo.getId(), keyword == null ? "" : keyword));
+        portfolioStats(portfolioSummary,refresh);
+        portfolioAllocation(portfolioSummary);
+        return portfolioSummary;
     }
 
-    public List<HoldingsDTO> filterSearchHoldings(GetPortfolioHoldingsDto portfolioHoldings, String keyword) {
-        Long currentUserId = authenticationService.getCurrentUserId();
-        return portfolioHoldingsRepository.filterSearchHoldings(portfolioHoldings.getPortfolioId(), keyword, currentUserId);
+    public void portfolioAllocation(PortfolioDetailsDto portfolioSummary){
+        for(PortfolioDetailsDto.HoldingsDto holding: portfolioSummary.getHoldings()){
+            holding.setAllocation(
+                    (holding.getCurrentValue()/portfolioSummary.getPortfolioValue())*100);
+        }
+    }
+
+    public void portfolioStats(PortfolioDetailsDto portfolioSummary, boolean refresh){
+        double portfolioValue = 0.0;
+        double portfolioInvested = 0.0;
+        double portfolioGainOrLoss = 0.0;
+        LocalDateTime updatedAt = null;
+        LocalDateTime marketTimeStamp = null;
+        Long holdingsInPortfolio = (long) portfolioSummary.getHoldings().size();
+
+        for (PortfolioDetailsDto.HoldingsDto holding : portfolioSummary.getHoldings()) {
+            double currentValue = 0.0;
+            double investedAmount = 0.0;
+            Double price = holding.getPrice();
+
+            LocalDateTime currentUpdatedAt = holding.getUpdatedAt();
+            LocalDateTime currentMarketTimeStamp = holding.getMarketTimeStamp();
+
+            if (price == null ||
+                    currentUpdatedAt == null ||
+                    currentMarketTimeStamp == null ||
+                    (refresh  &&
+                            holding.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)))) {
+
+                PortfolioValueAndUpdatedAtDto imported =
+                        stockCurrentPricesService.importStockPrices(holding.getTicker());
+
+                price = imported.getPrices();
+                currentUpdatedAt = imported.getUpdatedAt();
+                currentMarketTimeStamp = imported.getMarketTimeStamp();
+            }
+            investedAmount = holding.getShares() * holding.getAvgPrice();
+            currentValue = price * holding.getShares();
+            holding.setInvestedAmount(investedAmount);
+            holding.setCurrentValue(currentValue);
+            double gainOrLoss = currentValue - investedAmount;
+            holding.setGainOrLoss(gainOrLoss);
+            holding.setGainOrLossPercent((gainOrLoss/investedAmount)*100);
+
+            if (updatedAt == null || currentUpdatedAt.isAfter(updatedAt)) {
+                updatedAt = currentUpdatedAt;
+            }
+
+            if (marketTimeStamp == null || currentMarketTimeStamp.isAfter(marketTimeStamp)) {
+                marketTimeStamp = currentMarketTimeStamp;
+            }
+            portfolioInvested += investedAmount;
+            portfolioValue += currentValue;
+            portfolioGainOrLoss += gainOrLoss;
+        }
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a");
+
+        String formattedLastUpdated =
+                updatedAt != null ? updatedAt.format(formatter) : null;
+
+        String formattedMarketTimestamp =
+                marketTimeStamp != null ? marketTimeStamp.format(formatter) : null;
+
+            portfolioSummary.setPortfolioValue(portfolioValue);
+            portfolioSummary.setLastUpdatedAt(formattedLastUpdated);
+            portfolioSummary.setMarketTimeStamp(formattedMarketTimestamp);
+            portfolioSummary.setPortfolioHoldings(holdingsInPortfolio);
+            portfolioSummary.setPortfolioInvested(portfolioInvested);
+            portfolioSummary.setGainOrLoss(portfolioGainOrLoss);
+            portfolioSummary.setGainOrLossPercent((portfolioGainOrLoss/portfolioInvested)*100);
     }
 }
