@@ -1,15 +1,13 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.*;
-import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.HoldingsDTO;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioDetailsDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.PortfolioHoldingsService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 public class PortfolioHoldingsController {
@@ -51,16 +49,13 @@ public class PortfolioHoldingsController {
         return ResponseEntity.internalServerError().body("List of holdings could not be deleted");
     }
 
-//    @GetMapping("/getAllHoldings")
-//    public ResponseEntity<List<HoldingsDTO>> getAllHoldings(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings){
-//        return ResponseEntity.ok(portfolioHoldingsService.getAllHoldings(portfolioHoldings));
-//    }
-
     @GetMapping("/getAllHoldings")
-    public ResponseEntity<List<HoldingsDTO>> filterPortfoliosByNameByUser(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings, @RequestParam(required = false) String keyword){
-        if (keyword != null) {
-           return ResponseEntity.ok(portfolioHoldingsService.filterSearchHoldings(portfolioHoldings, keyword));
-        }
-        return ResponseEntity.ok(portfolioHoldingsService.getAllHoldings(portfolioHoldings));
+    public ResponseEntity<PortfolioDetailsDto> filterPortfoliosByNameByUser(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings, @RequestParam(required = false) String keyword){
+        return ResponseEntity.ok(portfolioHoldingsService.portfolioSummary(portfolioHoldings, keyword, false));
+    }
+
+    @GetMapping("/getAllHoldings/refresh")
+    public ResponseEntity<PortfolioDetailsDto> refreshPortfolioStats(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings){
+        return ResponseEntity.ok(portfolioHoldingsService.portfolioSummary(portfolioHoldings,null, true));
     }
 }
