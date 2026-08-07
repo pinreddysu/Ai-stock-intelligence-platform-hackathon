@@ -8,6 +8,7 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
@@ -30,6 +31,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import { Search } from "@mui/icons-material";
 import portfolioService from "@/services/portfolioService";
+import { init } from "next/dist/compiled/webpack/webpack";
 
 interface Portfolio {
   id: number;
@@ -53,6 +55,7 @@ export default function Portfolio() {
     description: "",
   });
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setIntialLoading] = useState(true);
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(
     null,
   );
@@ -112,6 +115,7 @@ export default function Portfolio() {
     try {
       const response = await portfolioService.getAllUserPortfolio("");
       setUserPortfolio(response.data);
+      setIntialLoading(false);
     } catch (error: any) {
       if (error.response?.status === 401 || error.code === "ERR_NETWORK") {
         localStorage.removeItem("token");
@@ -184,240 +188,272 @@ export default function Portfolio() {
 
   return (
     <Box>
-      <AppBar position="static">
-        <Toolbar>
-          <Logo />
-          <Button
-            variant="contained"
-            sx={{
-              ml: "auto",
-            }}
-            startIcon={<PersonIcon />}
-          >
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="xl">
+      {initialLoading && (
         <Box
           sx={{
-            py: 4,
             display: "flex",
+            justifyContent: "center",
             alignItems: "center",
+            width: "100vw",
+            height: "100vh",
           }}
         >
-          <PortfolioPageHeader />
-          <Button
-            variant="contained"
-            sx={{
-              ml: "auto",
-            }}
-            onClick={handleOpen}
-            startIcon={<AddIcon />}
-          >
-            Create Portfolio
-          </Button>
-          <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-            <Box component="form" onSubmit={handleSubmit}>
-              <DialogTitle>
-                {editPortfolio ? (
-                  <Typography
-                    component="span"
-                    variant="h5"
-                    sx={{ fontWeight: "bold" }}
-                  >
-                    Edit Portfolio
-                  </Typography>
-                ) : (
-                  <Typography
-                    component="span"
-                    variant="h5"
-                    sx={{ fontWeight: "bold" }}
-                  >
-                    Create Portfolio
-                  </Typography>
-                )}
-              </DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  <Typography component="span" variant="body1">
-                    Please fill out required fields
-                  </Typography>
-                </DialogContentText>
-                <TextField
-                  autoFocus
-                  required
-                  margin="dense"
-                  onChange={(e) => {
-                    setPortfolio({
-                      ...portfolio,
-                      portfolioName: e.target.value,
-                    });
-                  }}
-                  id="portfolioName"
-                  name="portfolioName"
-                  label="Portfolio Name"
-                  value={portfolio.portfolioName}
-                  fullWidth
-                  variant="outlined"
-                  slotProps={{
-                    htmlInput: { maxLength: 50 },
-                  }}
-                />
-                <TextField
-                  margin="dense"
-                  multiline
-                  onChange={(e) => {
-                    setPortfolio({
-                      ...portfolio,
-                      description: e.target.value,
-                    });
-                  }}
-                  id="portfolioDescription"
-                  name="portfolioDescription"
-                  value={portfolio.description}
-                  label="Portfolio Description"
-                  fullWidth
-                  variant="outlined"
-                  rows={3}
-                  slotProps={{
-                    htmlInput: { maxLength: 250 },
-                  }}
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleClose} disabled={loading}>
-                  Cancel
-                </Button>
-                {editPortfolio ? (
-                  <Button
-                    type="submit"
-                    disabled={
-                      loading ||
-                      !hasChange ||
-                      portfolio.portfolioName.trim() === "" ||
-                      portfolio.description.trim() === ""
-                    }
-                  >
-                    {loading ? "Updating" : "update"}
-                  </Button>
-                ) : (
-                  <Button
-                    type="submit"
-                    disabled={
-                      loading || portfolio.portfolioName.trim().length === 0
-                    }
-                  >
-                    {loading ? "Creating" : "Create"}
-                  </Button>
-                )}
-              </DialogActions>
-            </Box>
-          </Dialog>
-        </Box>
-      </Container>
-      <Box sx={{ mb: 3, px: 3, justifyContent: "flex-start", display: "flex" }}>
-        <TextField
-          variant="outlined"
-          id="searchPortfolio"
-          name="searchPortfolio"
-          value={searchValue}
-          sx={{ width: "50%" }}
-          placeholder=" Search portfolio"
-          onChange={(e) => {
-            setSearchValue(e.target.value);
-          }}
-          slotProps={{
-            input: {
-              startAdornment: <Search />,
-            },
-            htmlInput: {
-              maxLength: 50,
-            },
-          }}
-        ></TextField>
-      </Box>
-
-      {noResultsFound.length > 0 && (
-        <Box
-          sx={{ mb: 3, px: 3, justifyContent: "flex-start", display: "flex" }}
-        >
-          <Alert variant="outlined" severity="warning">
-            {noResultsFound}
-          </Alert>
+          <CircularProgress />
         </Box>
       )}
-      <Grid container sx={{ py: 3, px: 3 }} spacing={5}>
-        {userPortfolio.map((item) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.id}>
-            <Card
-              key={item.id}
-              elevation={4}
+      {initialLoading === false && (
+        <Box>
+          <AppBar position="static">
+            <Toolbar>
+              <Logo />
+              <Button
+                variant="contained"
+                sx={{
+                  ml: "auto",
+                }}
+                startIcon={<PersonIcon />}
+              >
+                Logout
+              </Button>
+            </Toolbar>
+          </AppBar>
+          <Container maxWidth="xl">
+            <Box
               sx={{
-                height: "100%",
-                borderRadius: 3,
-                cursor: "pointer",
-                transition: "0.2s",
-                "&:hover": {
-                  transform: "translateY(-4px)",
-                  boxShadow: 8,
-                },
+                py: 4,
+                display: "flex",
+                alignItems: "center",
               }}
             >
-              <CardActionArea onClick={() => router.push("/portfolioDetails")}>
-                <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    {item.portfolioName}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    color="text.secondary"
-                    sx={{ mt: 1, minHeight: 40 }}
-                  >
-                    {item.description}
-                  </Typography>
-                  {item.holdings < 1 ? (
-                    <Typography sx={{ mt: 3 }}>
-                      {item.holdings} holding
-                    </Typography>
-                  ) : (
-                    <Typography sx={{ mt: 3 }}>
-                      {" "}
-                      {item.holdings} holdings
-                    </Typography>
-                  )}
-                </CardContent>
-              </CardActionArea>
-              <CardActions
-                sx={{ justifyContent: "space-between", px: 2, boxShadow: 12 }}
+              <PortfolioPageHeader />
+              <Button
+                variant="contained"
+                sx={{
+                  ml: "auto",
+                }}
+                onClick={handleOpen}
+                startIcon={<AddIcon />}
               >
-                <Button
-                  size="small"
-                  onClick={() => handleEdit(item)}
-                  startIcon={<EditIcon />}
+                Create Portfolio
+              </Button>
+              <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+                <Box component="form" onSubmit={handleSubmit}>
+                  <DialogTitle>
+                    {editPortfolio ? (
+                      <Typography
+                        component="span"
+                        variant="h5"
+                        sx={{ fontWeight: "bold" }}
+                      >
+                        Edit Portfolio
+                      </Typography>
+                    ) : (
+                      <Typography
+                        component="span"
+                        variant="h5"
+                        sx={{ fontWeight: "bold" }}
+                      >
+                        Create Portfolio
+                      </Typography>
+                    )}
+                  </DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      <Typography component="span" variant="body1">
+                        Please fill out required fields
+                      </Typography>
+                    </DialogContentText>
+                    <TextField
+                      autoFocus
+                      required
+                      margin="dense"
+                      onChange={(e) => {
+                        setPortfolio({
+                          ...portfolio,
+                          portfolioName: e.target.value,
+                        });
+                      }}
+                      id="portfolioName"
+                      name="portfolioName"
+                      label="Portfolio Name"
+                      value={portfolio.portfolioName}
+                      fullWidth
+                      variant="outlined"
+                      slotProps={{
+                        htmlInput: { maxLength: 50 },
+                      }}
+                    />
+                    <TextField
+                      margin="dense"
+                      multiline
+                      onChange={(e) => {
+                        setPortfolio({
+                          ...portfolio,
+                          description: e.target.value,
+                        });
+                      }}
+                      id="portfolioDescription"
+                      name="portfolioDescription"
+                      value={portfolio.description}
+                      label="Portfolio Description"
+                      fullWidth
+                      variant="outlined"
+                      rows={3}
+                      slotProps={{
+                        htmlInput: { maxLength: 250 },
+                      }}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose} disabled={loading}>
+                      Cancel
+                    </Button>
+                    {editPortfolio ? (
+                      <Button
+                        type="submit"
+                        disabled={
+                          loading ||
+                          !hasChange ||
+                          portfolio.portfolioName.trim() === "" ||
+                          portfolio.description.trim() === ""
+                        }
+                      >
+                        {loading ? "Updating" : "update"}
+                      </Button>
+                    ) : (
+                      <Button
+                        type="submit"
+                        disabled={
+                          loading || portfolio.portfolioName.trim().length === 0
+                        }
+                      >
+                        {loading ? "Creating" : "Create"}
+                      </Button>
+                    )}
+                  </DialogActions>
+                </Box>
+              </Dialog>
+            </Box>
+          </Container>
+          <Box
+            sx={{ mb: 3, px: 3, justifyContent: "flex-start", display: "flex" }}
+          >
+            <TextField
+              variant="outlined"
+              id="searchPortfolio"
+              name="searchPortfolio"
+              value={searchValue}
+              sx={{ width: "50%" }}
+              placeholder=" Search portfolio"
+              onChange={(e) => {
+                setSearchValue(e.target.value);
+              }}
+              slotProps={{
+                input: {
+                  startAdornment: <Search />,
+                },
+                htmlInput: {
+                  maxLength: 50,
+                },
+              }}
+            ></TextField>
+          </Box>
+
+          {noResultsFound.length > 0 && (
+            <Box
+              sx={{
+                mb: 3,
+                px: 3,
+                justifyContent: "flex-start",
+                display: "flex",
+              }}
+            >
+              <Alert variant="outlined" severity="warning">
+                {noResultsFound}
+              </Alert>
+            </Box>
+          )}
+          <Grid container sx={{ py: 3, px: 3 }} spacing={5}>
+            {userPortfolio.map((item) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.id}>
+                <Card
+                  key={item.id}
+                  elevation={4}
+                  sx={{
+                    height: "100%",
+                    borderRadius: 3,
+                    cursor: "pointer",
+                    transition: "0.2s",
+                    "&:hover": {
+                      transform: "translateY(-4px)",
+                      boxShadow: 8,
+                    },
+                  }}
                 >
-                  Edit
-                </Button>
-                <Button
-                  size="small"
-                  startIcon={<ViewListIcon />}
-                  onClick={() => router.push(`/portfolioDetails/${item.id}`)}
-                >
-                  View Portfolio
-                </Button>
-                <Button
-                  size="small"
-                  color="error"
-                  onClick={() => handleDelete(item)}
-                  startIcon={<DeleteIcon />}
-                >
-                  Delete
-                </Button>
-              </CardActions>
-            </Card>
+                  <CardActionArea
+                    onClick={() => router.push("/portfolioDetails")}
+                  >
+                    <CardContent>
+                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                        {item.portfolioName}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ mt: 1, minHeight: 40 }}
+                      >
+                        {item.description}
+                      </Typography>
+                      {item.holdings < 1 ? (
+                        <Typography sx={{ mt: 3 }}>
+                          {item.holdings} holding
+                        </Typography>
+                      ) : (
+                        <Typography sx={{ mt: 3 }}>
+                          {" "}
+                          {item.holdings} holdings
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </CardActionArea>
+                  <CardActions
+                    sx={{
+                      justifyContent: "space-between",
+                      px: 2,
+                      boxShadow: 12,
+                    }}
+                  >
+                    <Button
+                      size="small"
+                      onClick={() => handleEdit(item)}
+                      startIcon={<EditIcon />}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="small"
+                      startIcon={<ViewListIcon />}
+                      onClick={() =>
+                        router.push(`/portfolioDetails/${item.id}`)
+                      }
+                    >
+                      View Portfolio
+                    </Button>
+                    <Button
+                      size="small"
+                      color="error"
+                      onClick={() => handleDelete(item)}
+                      startIcon={<DeleteIcon />}
+                    >
+                      Delete
+                    </Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
+        </Box>
+      )}
     </Box>
   );
 }
