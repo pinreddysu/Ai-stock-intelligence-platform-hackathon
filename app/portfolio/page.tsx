@@ -31,14 +31,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import { Search } from "@mui/icons-material";
 import portfolioService from "@/services/portfolioService";
-import { init } from "next/dist/compiled/webpack/webpack";
-
-interface Portfolio {
-  id: number;
-  portfolioName: string;
-  description: string;
-  holdings: number;
-}
+import { PortfolioInfo } from "@/types/portfolioInfoTypes";
 
 export default function Portfolio() {
   const router = useRouter();
@@ -59,7 +52,7 @@ export default function Portfolio() {
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<number | null>(
     null,
   );
-  const [userPortfolio, setUserPortfolio] = useState<Portfolio[]>([]);
+  const [userPortfolio, setUserPortfolio] = useState<PortfolioInfo[]>([]);
   const handleOpen = () => {
     setOpen(true);
   };
@@ -79,7 +72,7 @@ export default function Portfolio() {
     });
   };
 
-  const handleDelete = async (portfolio: Portfolio) => {
+  const handleDelete = async (portfolio: PortfolioInfo) => {
     const portfolioId = portfolio.id;
     console.log(portfolioId);
     try {
@@ -95,7 +88,7 @@ export default function Portfolio() {
     }
   };
 
-  const handleEdit = (portfolio: Portfolio) => {
+  const handleEdit = (portfolio: PortfolioInfo) => {
     setEditPortfolio(true);
     setSelectedPortfolioId(portfolio.id);
     const data = {
@@ -391,7 +384,7 @@ export default function Portfolio() {
                   }}
                 >
                   <CardActionArea
-                    onClick={() => router.push("/portfolioDetails")}
+                    onClick={() => router.push(`/portfolioDetails/${item.id}`)}
                   >
                     <CardContent>
                       <Typography variant="h6" sx={{ fontWeight: "bold" }}>
@@ -404,14 +397,14 @@ export default function Portfolio() {
                       >
                         {item.description}
                       </Typography>
-                      {item.holdings < 1 ? (
+                      {item.portfolioHoldings === 1 ? (
                         <Typography sx={{ mt: 3 }}>
-                          {item.holdings} holding
+                          {item.portfolioHoldings} holding
                         </Typography>
                       ) : (
                         <Typography sx={{ mt: 3 }}>
                           {" "}
-                          {item.holdings} holdings
+                          {item.portfolioHoldings} holdings
                         </Typography>
                       )}
                     </CardContent>
