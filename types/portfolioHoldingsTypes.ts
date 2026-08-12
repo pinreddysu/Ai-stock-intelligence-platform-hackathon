@@ -35,3 +35,52 @@ export interface PortfolioDetailsAndHoldings {
   marketTimeStamp: string;
   holdings: Holdings[];
 }
+
+export interface ColumnData {
+  dataKey: keyof Holdings;
+  label: string;
+  numeric?: boolean;
+  width?: number;
+}
+
+export const columns: ColumnData[] = [
+  {
+    width: 100,
+    label: "Ticker",
+    dataKey: "ticker",
+  },
+  {
+    width: 100,
+    label: "Shares",
+    dataKey: "shares",
+    numeric: true,
+  },
+  {
+    width: 100,
+    label: "Avg",
+    dataKey: "avgPrice",
+    numeric: true,
+  },
+  {
+    width: 100,
+    label: "Price",
+    dataKey: "price",
+    numeric: true,
+  },
+  {
+    width: 100,
+    label: "Value",
+    dataKey: "currentValue",
+    numeric: true,
+  },
+  {
+    width: 100,
+    label: "Allocation",
+    dataKey: "allocation",
+  },
+  {
+    width: 100,
+    label: "Gain %",
+    dataKey: "gainOrLossPercent",
+  },
+];
