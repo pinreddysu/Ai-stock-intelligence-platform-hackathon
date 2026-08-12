@@ -26,6 +26,7 @@ export interface PortfolioDetailsAndHoldings {
   portfolioName: string;
   description: string;
   portfolioHoldings: number;
+  filteredPortfolioHoldings: number;
   portfolioValue: number;
   portfolioInvested: number;
   gainOrLoss: number;
