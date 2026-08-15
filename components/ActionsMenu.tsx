@@ -1,11 +1,12 @@
 "use client";
 import { Button, Menu, MenuItem } from "@mui/material";
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import EditDialog from "./EditDialog";
 import {
   EditHoldingData,
   EditHoldingRequest,
 } from "@/types/portfolioHoldingsTypes";
+import DeleteHoldingDialog from "./DeleteHoldingDialog";
 
 type ActionMenu = {
   rowData: EditHoldingData;
@@ -21,6 +22,8 @@ export default function ActionMenu({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(0);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -34,9 +37,13 @@ export default function ActionMenu({
   };
 
   const handleCloseDelete = (id: number) => {
+    setOpenDeleteDialog(true);
     setAnchorEl(null);
-    deleteHolding(id);
   };
+
+  useEffect(() => {
+    deleteHolding(deleteConfirmation);
+  }, [deleteConfirmation]);
 
   return (
     <div>
@@ -81,6 +88,16 @@ export default function ActionMenu({
         }}
         closeDialog={setOpenDialog}
         updatedHoldingData={updatedHoldingData}
+      />
+      <DeleteHoldingDialog
+        openDeleteDialog={openDeleteDialog}
+        holdingData={{
+          id: rowData.id,
+          ticker: rowData.ticker,
+          companyName: rowData.companyName,
+        }}
+        closeDialog={setOpenDeleteDialog}
+        deleteConfirmation={setDeleteConfirmation}
       />
     </div>
   );
