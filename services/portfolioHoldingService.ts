@@ -4,8 +4,18 @@ export interface GetHoldingsByPortfolioIdRequest {
   portfolioId: number;
 }
 
-export interface UpdatePortfolioHoldingsDataRequest {
+export interface RefreshPortfolioHoldingsDataRequest {
   portfolioId: number;
+}
+
+export interface UpdatePortfiolioHoldingsRequest {
+  id: number;
+  shares: number;
+  avgPrice: number;
+}
+
+export interface DeletePortfolioHoldingRequest {
+  id: number;
 }
 
 const portfolioHoldingService = {
@@ -27,18 +37,43 @@ const portfolioHoldingService = {
     );
     return response;
   },
-  async updatePortfolioHoldingsData(
-    updatePortfolioHoldingsDataRequest: UpdatePortfolioHoldingsDataRequest,
+  async refreshPortfolioHoldingsData(
+    refreshPortfolioHoldingsDataRequest: RefreshPortfolioHoldingsDataRequest,
   ) {
     const response = await api.post(
       "/getAllHoldings/refresh",
-      updatePortfolioHoldingsDataRequest,
+      refreshPortfolioHoldingsDataRequest,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       },
     );
+    return response;
+  },
+  async updatePortfolioHoldings(
+    updatePortfolioHoldingsRequest: UpdatePortfiolioHoldingsRequest,
+  ) {
+    const response = await api.patch(
+      "/updateHoldings",
+      updatePortfolioHoldingsRequest,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      },
+    );
+    return response;
+  },
+  async deletePortfolioHOldings(
+    deletePortfolioHoldingRequest: DeletePortfolioHoldingRequest,
+  ) {
+    const response = await api.delete("/removeHoldings", {
+      data: deletePortfolioHoldingRequest,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     return response;
   },
 };
