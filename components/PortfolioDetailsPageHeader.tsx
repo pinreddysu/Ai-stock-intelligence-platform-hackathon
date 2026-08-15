@@ -1,33 +1,48 @@
 "use client";
-import { Box, Button } from "@mui/material";
-import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
+import { Alert, Box, Button, Snackbar } from "@mui/material";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
-import { useRouter } from "next/navigation";
 import portfolioHoldingService from "@/services/portfolioHoldingService";
 import { PortfolioDetailsAndHoldings } from "@/types/portfolioHoldingsTypes";
+import { HttpStatusCode } from "axios";
+import { useState } from "react";
+import BackPageRedirection from "./BackPageRedirection";
 
 type RefreshProps = {
   portfolioId: number;
+  searchValue: string;
+  size: number;
+  page: number;
   refreshData: (data: PortfolioDetailsAndHoldings) => void;
 };
 
 export default function PortfolioDetailsPageHeader({
   portfolioId,
+  searchValue,
+  size,
+  page,
   refreshData,
 }: RefreshProps) {
+  const [open, setOpen] = useState(false);
   const updatePortfolioHoldingsData = async () => {
     try {
       const response =
-        await portfolioHoldingService.updatePortfolioHoldingsData({
+        await portfolioHoldingService.refreshPortfolioHoldingsData({
           portfolioId,
         });
-      refreshData(response.data);
+      if (response.status === HttpStatusCode.Ok) {
+        const data = await portfolioHoldingService.getHoldingsByPortfolioId(
+          { portfolioId },
+          searchValue,
+          size,
+          page,
+        );
+        refreshData(data.data);
+      }
     } catch (error) {
-      console.error(error);
+      setOpen(true);
     }
   };
 
-  const router = useRouter();
 
   return (
     <Box
@@ -46,16 +61,7 @@ export default function PortfolioDetailsPageHeader({
         gap: 1,
       }}
     >
-      <Box>
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => router.replace("/portfolio")}
-          startIcon={<ArrowBackOutlinedIcon />}
-        >
-          Back To Portfolio List
-        </Button>
-      </Box>
+      <BackPageRedirection pageName="portfolioHoldings" route="portfolio" />
 
       <Box>
         <Button
@@ -67,6 +73,21 @@ export default function PortfolioDetailsPageHeader({
           Refresh portfolio
         </Button>
       </Box>
+      <Snackbar
+        anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
+        open={open}
+        autoHideDuration={1000}
+        onClose={() => setOpen(false)}
+      >
+        <Alert
+          onClose={() => setOpen(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Error refreshing holdings
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
