@@ -10,10 +10,11 @@ import ActionsMenu from "./ActionsMenu";
 import MoreDetails from "./MoreDetails";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { EditPortfolioInfo } from "@/types/portfolioInfoTypes";
 
 type Row = {
   row: Holdings;
-  updatedHoldingData: (data: EditHoldingRequest) => void;
+  updatedHoldingData: (data: EditHoldingRequest | EditPortfolioInfo) => void;
   deleteHolding: (data: number) => void;
 };
 
@@ -61,6 +62,7 @@ export default function Row({ row, updatedHoldingData, deleteHolding }: Row) {
               exchange: row.exchange,
               shares: row.shares,
               avgPrice: row.avgPrice,
+              type: "holding"
             }}
             updatedHoldingData={updatedHoldingData}
             deleteHolding={deleteHolding}
