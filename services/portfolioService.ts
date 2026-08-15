@@ -58,7 +58,7 @@ const portfolioService = {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
-    response.data;
+    return response;
   },
 };
 
