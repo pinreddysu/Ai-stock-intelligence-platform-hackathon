@@ -89,6 +89,7 @@ export interface EditHoldingRequest {
   id: number;
   shares: number;
   avgPrice: number;
+  type: "holding"
 }
 
 export interface EditHoldingData {
@@ -98,4 +99,5 @@ export interface EditHoldingData {
   exchange: string;
   shares: number;
   avgPrice: number;
+  type: "holding"
 }
