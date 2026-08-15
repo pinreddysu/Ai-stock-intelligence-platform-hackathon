@@ -4,10 +4,11 @@ import { TextField } from "@mui/material";
 import { useState } from "react";
 
 type SearchProp = {
+  page: string;
   searchData: (value: string) => void;
 };
 
-export default function SearchBar({ searchData}: SearchProp) {
+export default function SearchBar({ page, searchData }: SearchProp) {
   const [searchValue, setSearchValue] = useState("");
 
   return (
@@ -17,8 +18,8 @@ export default function SearchBar({ searchData}: SearchProp) {
       id="searchPortfolio"
       name="searchPortfolio"
       value={searchValue}
-      sx={{ sm: { width: "50%" }, xs: { width: "100%" } }}
-      placeholder="Search holdings"
+      sx={{ width: { sm: "50%", xs: "100%" } }}
+      placeholder={`Search ${page === "addHoldings" ? "stocks" : "holdings"}`}
       onChange={(e) => {
         setSearchValue(e.target.value);
         searchData(e.target.value);
