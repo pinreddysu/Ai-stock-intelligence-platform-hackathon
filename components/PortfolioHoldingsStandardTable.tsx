@@ -18,11 +18,12 @@ import {
 import React from "react";
 import { useState } from "react";
 import Row from "./HoldingsTableRow";
+import { EditPortfolioInfo } from "@/types/portfolioInfoTypes";
 
 type PaginationData = {
   pageData: (value: number) => void;
   sizeData: (value: number) => void;
-  updatedHoldingData: (data: EditHoldingRequest) => void;
+  updatedHoldingData: (data: EditHoldingRequest | EditPortfolioInfo) => void;
   deleteHolding: (data: number) => void;
   rows: Holdings[];
   totalData: number;
