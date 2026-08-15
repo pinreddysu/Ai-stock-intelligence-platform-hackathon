@@ -6,11 +6,12 @@ import {
   EditHoldingData,
   EditHoldingRequest,
 } from "@/types/portfolioHoldingsTypes";
-import DeleteHoldingDialog from "./DeleteHoldingDialog";
+import DeleteDialog from "./DeleteDialog";
+import { EditPortfolioInfo } from "@/types/portfolioInfoTypes";
 
 type ActionMenu = {
   rowData: EditHoldingData;
-  updatedHoldingData: (data: EditHoldingRequest) => void;
+  updatedHoldingData: (data: EditHoldingRequest | EditPortfolioInfo) => void;
   deleteHolding: (data: number) => void;
 };
 
@@ -78,24 +79,26 @@ export default function ActionMenu({
       </Menu>
       <EditDialog
         openDialog={openDialog}
-        rowData={{
+        rowDataOrPortfolio={{
           id: rowData.id,
           ticker: rowData.ticker,
           companyName: rowData.companyName,
           exchange: rowData.exchange,
           shares: rowData.shares,
           avgPrice: rowData.avgPrice,
+          type: "holding",
         }}
         closeDialog={setOpenDialog}
         updatedHoldingData={updatedHoldingData}
       />
-      <DeleteHoldingDialog
+      <DeleteDialog
         openDeleteDialog={openDeleteDialog}
-        holdingData={{
+        holdingDataOrPortfolio={{
           id: rowData.id,
           ticker: rowData.ticker,
           companyName: rowData.companyName,
           exchange: rowData.exchange,
+          type: "holdings",
         }}
         closeDialog={setOpenDeleteDialog}
         deleteConfirmation={setDeleteConfirmation}
