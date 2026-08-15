@@ -1,12 +1,33 @@
 "use client";
-import { PortfolioInfo } from "@/types/portfolioInfoTypes";
+import { EditPortfolioInfo, PortfolioInfo } from "@/types/portfolioInfoTypes";
 import { Box, Button, Typography } from "@mui/material";
+import DeleteDialog from "./DeleteDialog";
+import { useState } from "react";
+import EditDialog from "./EditDialog";
+import { EditHoldingRequest } from "@/types/portfolioHoldingsTypes";
+
+type PortfolioHoldingHeader = {
+  portfolioInfo: PortfolioInfo;
+  deletePortfolio: (data: number) => void;
+  editPortfolio: (data: EditHoldingRequest | EditPortfolioInfo) => void;
+};
 
 export default function PortfolioHoldingHeader({
-  props,
-}: {
-  props: PortfolioInfo;
-}) {
+  portfolioInfo,
+  deletePortfolio,
+  editPortfolio,
+}: PortfolioHoldingHeader) {
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+
+  const handleEdit = () => {
+    setOpenEditDialog(true);
+  };
+
+  const handleDelete = () => {
+    setOpenDeleteDialog(true);
+  };
+
   return (
     <Box
       sx={{
@@ -33,7 +54,7 @@ export default function PortfolioHoldingHeader({
             overflowWrap: "break-word",
           }}
         >
-          {props.portfolioName}
+          {portfolioInfo.portfolioName}
         </Typography>
 
         <Typography
@@ -43,7 +64,7 @@ export default function PortfolioHoldingHeader({
             overflowWrap: "break-word",
           }}
         >
-          {props.description}
+          {portfolioInfo.description}
         </Typography>
 
         <Typography
@@ -53,9 +74,9 @@ export default function PortfolioHoldingHeader({
             fontStyle: "italic",
           }}
         >
-          {props.portfolioHoldings === 1
-            ? `Total Holdings: ${props.portfolioHoldings}`
-            : `Total Holding: ${props.portfolioHoldings}`}
+          {portfolioInfo.portfolioHoldings === 1
+            ? `Total Holdings: ${portfolioInfo.portfolioHoldings}`
+            : `Total Holding: ${portfolioInfo.portfolioHoldings}`}
         </Typography>
       </Box>
       <Box
@@ -70,12 +91,35 @@ export default function PortfolioHoldingHeader({
           flexShrink: 0,
         }}
       >
-        <Button variant="outlined">Edit</Button>
-
-        <Button variant="outlined" color="error">
+        <Button variant="outlined" onClick={() => handleEdit()}>
+          Edit
+        </Button>
+        <Button variant="outlined" color="error" onClick={() => handleDelete()}>
           Delete
         </Button>
       </Box>
+      <DeleteDialog
+        openDeleteDialog={openDeleteDialog}
+        closeDialog={setOpenDeleteDialog}
+        deleteConfirmation={deletePortfolio}
+        holdingDataOrPortfolio={{
+          id: portfolioInfo.id,
+          portfolioName: portfolioInfo.portfolioName,
+          description: portfolioInfo.description,
+          type: "portfolio",
+        }}
+      />
+      <EditDialog
+        openDialog={openEditDialog}
+        rowDataOrPortfolio={{
+          id: portfolioInfo.id,
+          portfolioName: portfolioInfo.portfolioName,
+          description: portfolioInfo.description,
+          type: "portfolio",
+        }}
+        closeDialog={setOpenEditDialog}
+        updatedHoldingData={editPortfolio}
+      />
     </Box>
   );
 }
