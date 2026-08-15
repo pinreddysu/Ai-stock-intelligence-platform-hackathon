@@ -13,5 +13,19 @@ export interface PortfolioStatsData {
   gainOrLossPercent: number;
   portfolioHoldings: number;
   lastUpdatedAt: string;
-  marketTimeStamp:string;
+  marketTimeStamp: string;
+}
+
+export interface DeletePortfolioInfo {
+  id: number;
+  portfolioName: string;
+  description: string;
+  type: "portfolio";
+}
+
+export interface EditPortfolioInfo {
+  id: number;
+  portfolioName: string;
+  description: string;
+  type: "portfolio";
 }
