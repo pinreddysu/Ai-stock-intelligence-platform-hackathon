@@ -95,6 +95,7 @@ export default function ActionMenu({
           id: rowData.id,
           ticker: rowData.ticker,
           companyName: rowData.companyName,
+          exchange: rowData.exchange,
         }}
         closeDialog={setOpenDeleteDialog}
         deleteConfirmation={setDeleteConfirmation}
