@@ -84,3 +84,18 @@ export const columns: ColumnData[] = [
     dataKey: "gainOrLossPercent",
   },
 ];
+
+export interface EditHoldingRequest {
+  id: number;
+  shares: number;
+  avgPrice: number;
+}
+
+export interface EditHoldingData {
+  id: number;
+  ticker: string;
+  companyName: string;
+  exchange: string;
+  shares: number;
+  avgPrice: number;
+}
