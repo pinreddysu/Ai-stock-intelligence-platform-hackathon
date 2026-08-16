@@ -27,11 +27,7 @@ import SearchBar from "@/components/SearchBar";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import PortfolioHoldingsStandardTable from "@/components/PortfolioHoldingsStandardTable";
 import portfolioService from "@/services/portfolioService";
-
-interface Portfolio {
-  id: number;
-  portfolioName: string;
-}
+import { EditPortfolioInfo } from "@/types/portfolioInfoTypes";
 
 export default function PortfolioDetails() {
   const [open, setOpen] = useState(false);
@@ -40,14 +36,19 @@ export default function PortfolioDetails() {
   const [portfolioHoldingsTableData, setPortfolioHoldingsTableData] =
     useState<Holdings[]>();
   const [filteredPortfolioHoldings, setFilteredPortfolioHoldings] = useState(0);
-  const [updateHoldingValues, setUpdateHoldingValues] =
-    useState<EditHoldingRequest>();
+  const [updateHoldingValues, setUpdateHoldingValues] = useState<
+    EditHoldingRequest | EditPortfolioInfo
+  >();
   const params = useParams();
   const portfolioId = Number(params.id);
   const [searchValue, setSearchValue] = useState("");
   const [pageData, setPageData] = useState(0);
   const [sizeData, setSizeData] = useState(1);
   const [deleteHolding, setDeleteHolding] = useState<number>();
+  const [deletePortfolioId, setDeletePortfolioId] = useState<number>();
+  const [updatedPortfolioValue, setUpdatedPortfolioValue] = useState<
+    EditPortfolioInfo | EditHoldingRequest
+  >();
 
   const router = useRouter();
 
@@ -115,14 +116,17 @@ export default function PortfolioDetails() {
   const updateHoldingData = async () => {
     try {
       if (updateHoldingValues) {
-        // console.log(updateHoldingValues);
-        const response =
-          await portfolioHoldingService.updatePortfolioHoldings(
-            updateHoldingValues,
-          );
+        if (updateHoldingValues.type === "holding") {
+          const response =
+            await portfolioHoldingService.updatePortfolioHoldings({
+              id: updateHoldingValues.id,
+              avgPrice: updateHoldingValues.avgPrice,
+              shares: updateHoldingValues.shares,
+            });
 
-        getAllHoldingsById(searchValue, sizeData, pageData);
-        setOpenSnackBar(response.data);
+          getAllHoldingsById(searchValue, sizeData, pageData);
+          setOpenSnackBar(response.data);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -161,6 +165,42 @@ export default function PortfolioDetails() {
   useEffect(() => {
     deleteHoldingData();
   }, [deleteHolding]);
+
+  const deletePortfolio = async () => {
+    try {
+      if (deletePortfolioId) {
+        const response = await portfolioService.deleteUserPortfolioById({
+          id: deletePortfolioId,
+        });
+        setOpenSnackBar(response.data);
+        router.push("/portfolio");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    deletePortfolio();
+  }, [deletePortfolioId]);
+
+  const updatePortfolio = async () => {
+    if (updatedPortfolioValue) {
+      if (updatedPortfolioValue.type === "portfolio") {
+        const response = await portfolioService.editUserPortfolio({
+          id: updatedPortfolioValue.id,
+          portfolioName: updatedPortfolioValue.portfolioName,
+          description: updatedPortfolioValue.description,
+        });
+        getAllHoldingsById(searchValue, sizeData, pageData);
+        setOpenSnackBar("Portfolio has been updated!");
+      }
+    }
+  };
+
+  useEffect(() => {
+    updatePortfolio();
+  }, [updatedPortfolioValue]);
 
   return (
     <Box>
@@ -211,12 +251,14 @@ export default function PortfolioDetails() {
         </Box>
         {portfolioHoldings && (
           <PortfolioHoldingHeader
-            props={{
+            portfolioInfo={{
               id: portfolioHoldings.id,
               portfolioName: portfolioHoldings.portfolioName,
               description: portfolioHoldings.description,
               portfolioHoldings: portfolioHoldings.portfolioHoldings,
             }}
+            deletePortfolio={setDeletePortfolioId}
+            editPortfolio={setUpdatedPortfolioValue}
           />
         )}
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
@@ -288,7 +330,7 @@ export default function PortfolioDetails() {
       <Snackbar
         anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
         open={openSnackBar !== ""}
-        autoHideDuration={1000}
+        autoHideDuration={3000}
         onClose={handleCloseSnackBar}
       >
         <Alert
