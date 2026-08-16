@@ -178,7 +178,7 @@ export default function Portfolio() {
   };
 
   return (
-    <Box>
+    <>
       {initialLoading && (
         <Box
           sx={{
@@ -445,6 +445,6 @@ export default function Portfolio() {
           </Grid>
         </Box>
       )}
-    </Box>
+    </>
   );
 }
