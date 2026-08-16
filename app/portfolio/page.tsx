@@ -74,12 +74,10 @@ export default function Portfolio() {
 
   const handleDelete = async (portfolio: PortfolioInfo) => {
     const portfolioId = portfolio.id;
-    console.log(portfolioId);
     try {
       const response = await portfolioService.deleteUserPortfolioById({
         id: portfolioId,
       });
-      console.log(response);
       getPortfolios();
     } catch (error) {
       console.log(error);
