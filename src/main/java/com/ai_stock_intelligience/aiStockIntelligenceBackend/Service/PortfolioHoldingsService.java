@@ -3,16 +3,21 @@ package com.ai_stock_intelligience.aiStockIntelligenceBackend.Service;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.*;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioDetailsDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioValueAndUpdatedAtDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.StocksDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Stocks;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.PortfolioHoldingsRepository;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.StocksRepository;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserPortfolioRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -120,14 +125,27 @@ public class PortfolioHoldingsService {
         return null;
     }
 
-    public PortfolioDetailsDto portfolioSummary(GetPortfolioHoldingsDto portfolioHoldings, String keyword, boolean refresh){
+    public PortfolioDetailsDto portfolioSummary(GetPortfolioHoldingsDto portfolioHoldings, String keyword, boolean refresh, int page, int size){
         Long currentUserId = authenticationService.getCurrentUserId();
+        Pageable pageable = PageRequest.of(page, size);
         UserPortfolio portfolioInfo = userPortfolioRepository.findByIdAndUserIdAndDeletedAtIsNull(
                 portfolioHoldings.getPortfolioId(), currentUserId);
         PortfolioDetailsDto portfolioSummary = new PortfolioDetailsDto(portfolioInfo.getPortfolioName(),
                 portfolioInfo.getId(), portfolioInfo.getDescription());
-        portfolioSummary.setHoldingsDto(portfolioHoldingsRepository.getPortfolioHoldings(portfolioInfo.getId(), keyword == null ? "" : keyword));
+        portfolioSummary.setHoldingsDto(portfolioHoldingsRepository.getPortfolioHoldings(portfolioInfo.getId()));
+        portfolioSummary.setPortfolioHoldings((long) portfolioSummary.getHoldings().size());
         portfolioStats(portfolioSummary,refresh);
+
+        Page<PortfolioDetailsDto.HoldingsDto> holdingsDtoPage = portfolioHoldingsRepository.getPortfolioHoldings(portfolioInfo.getId(), keyword == null ? "":keyword, pageable );
+        portfolioSummary.setHoldingsDto(holdingsDtoPage.getContent());
+        portfolioSummary.setFilteredPortfolioHoldings(holdingsDtoPage.getTotalElements());
+        for(PortfolioDetailsDto.HoldingsDto holdingsDto: portfolioSummary.getHoldings()){
+            holdingsDto.setInvestedAmount(holdingsDto.getAvgPrice()*holdingsDto.getShares());
+            holdingsDto.setCurrentValue(holdingsDto.getPrice()*holdingsDto.getShares());
+            double gainOrLoss = holdingsDto.getCurrentValue()- holdingsDto.getInvestedAmount();
+            holdingsDto.setGainOrLoss(gainOrLoss);
+            holdingsDto.setGainOrLossPercent((gainOrLoss/ holdingsDto.getInvestedAmount())*100);
+        }
         portfolioAllocation(portfolioSummary);
         return portfolioSummary;
     }
@@ -162,7 +180,7 @@ public class PortfolioHoldingsService {
                             holding.getUpdatedAt().isBefore(LocalDateTime.now().minusMinutes(5)))) {
 
                 PortfolioValueAndUpdatedAtDto imported =
-                        stockCurrentPricesService.importStockPrices(holding.getTicker());
+                        stockCurrentPricesService.importStockPricesForPortfolioValue(holding.getTicker());
 
                 price = imported.getPrices();
                 currentUpdatedAt = imported.getUpdatedAt();
@@ -170,12 +188,7 @@ public class PortfolioHoldingsService {
             }
             investedAmount = holding.getShares() * holding.getAvgPrice();
             currentValue = price * holding.getShares();
-            holding.setInvestedAmount(investedAmount);
-            holding.setCurrentValue(currentValue);
             double gainOrLoss = currentValue - investedAmount;
-            holding.setGainOrLoss(gainOrLoss);
-            holding.setGainOrLossPercent((gainOrLoss/investedAmount)*100);
-
             if (updatedAt == null || currentUpdatedAt.isAfter(updatedAt)) {
                 updatedAt = currentUpdatedAt;
             }
@@ -200,7 +213,7 @@ public class PortfolioHoldingsService {
             portfolioSummary.setPortfolioValue(portfolioValue);
             portfolioSummary.setLastUpdatedAt(formattedLastUpdated);
             portfolioSummary.setMarketTimeStamp(formattedMarketTimestamp);
-            portfolioSummary.setPortfolioHoldings(holdingsInPortfolio);
+//            portfolioSummary.setPortfolioHoldings(holdingsInPortfolio);
             portfolioSummary.setPortfolioInvested(portfolioInvested);
             portfolioSummary.setGainOrLoss(portfolioGainOrLoss);
             portfolioSummary.setGainOrLossPercent((portfolioGainOrLoss/portfolioInvested)*100);
