@@ -2,6 +2,8 @@ package com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.PortfolioDetailsDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.PortfolioHoldings;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -44,7 +46,33 @@ public interface PortfolioHoldingsRepository extends JpaRepository<PortfolioHold
             OR LOWER(ph.stocks.exchange) LIKE LOWER(CONCAT('%', :keyword, '%'))
             OR LOWER(ph.stocks.sector) LIKE LOWER(CONCAT('%', :keyword, '%'))
             OR LOWER(ph.stocks.industry) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            ORDER BY ph.stocks.ticker ASC
             """)
-    List<PortfolioDetailsDto.HoldingsDto> getPortfolioHoldings(@Param("id") Long portfolioId,
-                                                               @Param("keyword") String keyword);
+    Page<PortfolioDetailsDto.HoldingsDto> getPortfolioHoldings(@Param("id") Long portfolioId,
+                                                               @Param("keyword") String keyword,
+                                                               Pageable pageable);
+
+    @Query("""
+            SELECT ph.id AS holdingId,
+            ph.stocks.id AS stockId,
+            ph.stocks.ticker AS ticker,
+            ph.stocks.companyName AS companyName,
+            ph.stocks.exchange AS exchange,
+            ph.stocks.sector AS sector,
+            ph.stocks.industry AS industry,
+            ph.shares AS shares,
+            ph.avgPrice AS avgPrice,
+            scp.prices AS price,
+            scp.previousClose AS previousClose,
+            scp.change AS dailyChange,
+            scp.changePercentage AS dailyChangePercent,
+            scp.marketTimeStamp AS marketTimeStamp,
+            scp.updatedAt AS updatedAt
+            FROM PortfolioHoldings ph LEFT OUTER JOIN
+            StockCurrentPrices scp
+            ON scp.stocks.id = ph.stocks.id
+            WHERE ph.userPortfolio.id = :id
+            AND ph.deletedAt IS NULL
+            """)
+    List<PortfolioDetailsDto.HoldingsDto> getPortfolioHoldings(@Param("id") Long portfolioId);
 }
