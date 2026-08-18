@@ -31,7 +31,7 @@ export default function MoreDetails({ props }: { props: Holdings }) {
       </Box>
       <Box sx={{ textAlign: "center" }}>
         <Typography variant="body2">Invested Amount:</Typography>
-        <Typography variant="body2">${props.investedAmount}</Typography>
+        <Typography variant="body2">${props.investedAmount.toFixed(2)}</Typography>
       </Box>
       <Box sx={{ textAlign: "center" }}>
         <Typography variant="body2">Change:</Typography>
