@@ -25,6 +25,7 @@ type DeleteDialogProps = {
   deleteConfirmation: (data: number) => void;
   closeDialog: (data: boolean) => void;
 };
+
 export default function DeleteDialog({
   openDeleteDialog,
   holdingDataOrPortfolio,
@@ -93,9 +94,13 @@ export default function DeleteDialog({
                 <Typography variant="subtitle1" color="textPrimary">
                   Portfolio: {holdingDataOrPortfolio.portfolioName}
                 </Typography>
-                <Typography variant="subtitle1" color="textPrimary">
-                  Portfolio Description: {holdingDataOrPortfolio.description}
-                </Typography>
+                {holdingDataOrPortfolio.description?.length !== 0 &&
+                  holdingDataOrPortfolio.description.trim() !== "" && (
+                    <Typography variant="subtitle1" color="textPrimary">
+                      Portfolio Description:{" "}
+                      {holdingDataOrPortfolio.description}
+                    </Typography>
+                  )}
               </>
             )}
           </Box>
