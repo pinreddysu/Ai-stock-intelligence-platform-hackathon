@@ -12,6 +12,7 @@ type RefreshProps = {
   searchValue: string;
   size: number;
   page: number;
+  portfolioHoldingsLength: number;
   refreshData: (data: PortfolioDetailsAndHoldings) => void;
 };
 
@@ -20,6 +21,7 @@ export default function PortfolioDetailsPageHeader({
   searchValue,
   size,
   page,
+  portfolioHoldingsLength,
   refreshData,
 }: RefreshProps) {
   const [open, setOpen] = useState(false);
@@ -42,7 +44,6 @@ export default function PortfolioDetailsPageHeader({
       setOpen(true);
     }
   };
-
 
   return (
     <Box
@@ -69,6 +70,7 @@ export default function PortfolioDetailsPageHeader({
           size="small"
           onClick={updatePortfolioHoldingsData}
           startIcon={<RefreshOutlinedIcon />}
+          disabled={portfolioHoldingsLength === 0}
         >
           Refresh portfolio
         </Button>
