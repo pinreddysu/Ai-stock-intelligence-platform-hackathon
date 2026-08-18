@@ -28,16 +28,20 @@ public class PortfolioHoldingsService {
 
     private final ImportStockPriceService stockCurrentPricesService;
 
+    private final StocksService stocksService;
+
     public PortfolioHoldingsService(PortfolioHoldingsRepository portfolioHoldingsRepository,
                                     AuthenticationService authenticationService,
                                     UserPortfolioRepository userPortfolioRepository,
                                     StocksRepository stocksRepository,
-                                    ImportStockPriceService stockCurrentPricesService) {
+                                    ImportStockPriceService stockCurrentPricesService,
+                                    StocksService stocksService) {
         this.portfolioHoldingsRepository = portfolioHoldingsRepository;
         this.authenticationService = authenticationService;
         this.userPortfolioRepository = userPortfolioRepository;
         this.stocksRepository = stocksRepository;
         this.stockCurrentPricesService = stockCurrentPricesService;
+        this.stocksService = stocksService;
     }
 
     public boolean deleteHoldings(RemoveHoldingRequestDto portfolioHoldings) {
