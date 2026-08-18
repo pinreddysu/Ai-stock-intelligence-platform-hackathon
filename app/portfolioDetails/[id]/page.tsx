@@ -5,6 +5,7 @@ import {
   AppBar,
   Box,
   Button,
+  CircularProgress,
   Container,
   Snackbar,
   SnackbarCloseReason,
@@ -46,6 +47,7 @@ export default function PortfolioDetails() {
   const [sizeData, setSizeData] = useState(1);
   const [deleteHolding, setDeleteHolding] = useState<number>();
   const [deletePortfolioId, setDeletePortfolioId] = useState<number>();
+  const [initialLoading, setIntialLoading] = useState(true);
   const [updatedPortfolioValue, setUpdatedPortfolioValue] = useState<
     EditPortfolioInfo | EditHoldingRequest
   >();
@@ -98,11 +100,17 @@ export default function PortfolioDetails() {
       setFilteredPortfolioHoldings(
         response.data.filteredPortfolioHoldings ?? 0,
       );
+      setIntialLoading(false);
     } catch (error: any) {
       if (currentRequestId !== requestId.current) {
         return;
       }
-      console.error(error);
+      if (error.response?.status === 401 || error.code === "ERR_NETWORK") {
+        localStorage.removeItem("token");
+        router.replace("/login");
+      } else {
+        console.error("Failed to fetch portfolios", error);
+      }
     }
   };
 
@@ -151,7 +159,7 @@ export default function PortfolioDetails() {
   const deleteHoldingData = async () => {
     try {
       if (deleteHolding) {
-        const response = await portfolioHoldingService.deletePortfolioHOldings({
+        const response = await portfolioHoldingService.deletePortfolioHoldings({
           id: deleteHolding,
         });
         getAllHoldingsById(searchValue, sizeData, pageData);
@@ -203,145 +211,185 @@ export default function PortfolioDetails() {
   }, [updatedPortfolioValue]);
 
   return (
-    <Box>
-      <AppBar position="static">
-        <Toolbar>
-          <Logo />
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="xl">
+    <>
+      {initialLoading && (
         <Box
           sx={{
-            py: 4,
-            pb: 1,
             display: "flex",
+            justifyContent: "center",
             alignItems: "center",
+            width: "100vw",
+            height: "100vh",
           }}
         >
-          <PortfolioDetailsPageHeader
-            portfolioId={portfolioId}
-            refreshData={handleRefreshData}
-            searchValue={searchValue}
-            page={pageData}
-            size={sizeData}
-          />
+          <CircularProgress />
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-end",
-            gap: 0.25,
-          }}
-        >
-          <Typography
-            variant="caption"
-            color="inherit"
-            sx={{
-              fontStyle: "italic",
-            }}
-          >{`Market last updated: ${portfolioHoldings?.marketTimeStamp}`}</Typography>
-          <Typography
-            variant="caption"
-            color="inherit"
-            sx={{
-              fontStyle: "italic",
-            }}
-          >{`Portfolio last updated: ${portfolioHoldings?.lastUpdatedAt}`}</Typography>
-        </Box>
-        {portfolioHoldings && (
-          <PortfolioHoldingHeader
-            portfolioInfo={{
-              id: portfolioHoldings.id,
-              portfolioName: portfolioHoldings.portfolioName,
-              description: portfolioHoldings.description,
-              portfolioHoldings: portfolioHoldings.portfolioHoldings,
-            }}
-            deletePortfolio={setDeletePortfolioId}
-            editPortfolio={setUpdatedPortfolioValue}
-          />
-        )}
-        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert
-            onClose={handleClose}
-            severity="success"
-            variant="filled"
-            sx={{ width: "100%" }}
-          >
-            Portfolio details have been updated!
-          </Alert>
-        </Snackbar>
-        <Box sx={{ py: 4 }}>
-          {portfolioHoldings && (
-            <PortfolioStats
-              props={{
-                id: portfolioHoldings?.id,
-                portfolioValue: portfolioHoldings.portfolioValue,
-                portfolioInvested: portfolioHoldings.portfolioInvested,
-                gainOrLoss: portfolioHoldings.gainOrLoss,
-                gainOrLossPercent: portfolioHoldings.gainOrLossPercent,
-                portfolioHoldings: portfolioHoldings.portfolioHoldings,
-                lastUpdatedAt: portfolioHoldings.lastUpdatedAt,
-                marketTimeStamp: portfolioHoldings.marketTimeStamp,
+      )}
+      {initialLoading === false && (
+        <Box>
+          <AppBar position="static">
+            <Toolbar>
+              <Logo />
+            </Toolbar>
+          </AppBar>
+          <Container maxWidth="xl">
+            <Box
+              sx={{
+                py: 4,
+                pb: 1,
+                display: "flex",
+                alignItems: "center",
               }}
-            />
-          )}
-        </Box>
-        <Box
-          sx={{
-            py: 0,
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              gap: 2,
-              justifyContent: { sm: "space-between" },
-              flexDirection: { xs: "column", sm: "row" },
-            }}
-          >
-            <SearchBar searchData={handleSearch} page="portfolioDetails" />
-            <Button
-              startIcon={<AddOutlinedIcon />}
-              size="small"
-              variant="contained"
-              onClick={() =>
-                router.push(`/portfolioDetails/${portfolioId}/addHoldings`)
-              }
             >
-              Add Holdings
-            </Button>
-          </Box>
-          {portfolioHoldings && portfolioHoldingsTableData != null && (
-            <Box sx={{ py: 2 }}>
-              <PortfolioHoldingsStandardTable
-                sizeData={setSizeData}
-                pageData={setPageData}
-                rows={portfolioHoldings.holdings ?? []}
-                totalData={filteredPortfolioHoldings}
-                pageNumber={pageData}
-                updatedHoldingData={setUpdateHoldingValues}
-                deleteHolding={setDeleteHolding}
+              <PortfolioDetailsPageHeader
+                portfolioId={portfolioId}
+                refreshData={handleRefreshData}
+                searchValue={searchValue}
+                page={pageData}
+                size={sizeData}
+                portfolioHoldingsLength={
+                  portfolioHoldings?.holdings.length ?? 0
+                }
               />
             </Box>
-          )}
+            {portfolioHoldings?.holdings.length !== 0 && (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-end",
+                  gap: 0.25,
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  color="inherit"
+                  sx={{
+                    fontStyle: "italic",
+                  }}
+                >{`Market last updated: ${portfolioHoldings?.marketTimeStamp}`}</Typography>
+                <Typography
+                  variant="caption"
+                  color="inherit"
+                  sx={{
+                    fontStyle: "italic",
+                  }}
+                >{`Portfolio last updated: ${portfolioHoldings?.lastUpdatedAt}`}</Typography>
+              </Box>
+            )}
+            {portfolioHoldings && (
+              <PortfolioHoldingHeader
+                portfolioInfo={{
+                  id: portfolioHoldings.id,
+                  portfolioName: portfolioHoldings.portfolioName,
+                  description: portfolioHoldings?.description,
+                  portfolioHoldings: portfolioHoldings.portfolioHoldings,
+                }}
+                deletePortfolio={setDeletePortfolioId}
+                editPortfolio={setUpdatedPortfolioValue}
+              />
+            )}
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+              <Alert
+                onClose={handleClose}
+                severity="success"
+                variant="filled"
+                sx={{ width: "100%" }}
+              >
+                Portfolio details have been updated!
+              </Alert>
+            </Snackbar>
+            <Box sx={{ py: 4 }}>
+              {portfolioHoldings && portfolioHoldings.holdings.length !== 0 && (
+                <PortfolioStats
+                  props={{
+                    id: portfolioHoldings?.id,
+                    portfolioValue: portfolioHoldings.portfolioValue,
+                    portfolioInvested: portfolioHoldings.portfolioInvested,
+                    gainOrLoss: portfolioHoldings.gainOrLoss,
+                    gainOrLossPercent: portfolioHoldings.gainOrLossPercent,
+                    portfolioHoldings: portfolioHoldings.portfolioHoldings,
+                    lastUpdatedAt: portfolioHoldings.lastUpdatedAt,
+                    marketTimeStamp: portfolioHoldings.marketTimeStamp,
+                  }}
+                />
+              )}
+            </Box>
+            <Box
+              sx={{
+                py: 0,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  justifyContent: { sm: "space-between" },
+                  flexDirection: { xs: "column", sm: "row" },
+                }}
+              >
+                <SearchBar
+                  disabled={
+                    portfolioHoldingsTableData?.length === 0 ? true : false
+                  }
+                  searchData={handleSearch}
+                  page="portfolioDetails"
+                />
+                <Button
+                  startIcon={<AddOutlinedIcon />}
+                  size="small"
+                  variant="contained"
+                  onClick={() =>
+                    router.push(`/portfolioDetails/${portfolioId}/addHoldings`)
+                  }
+                >
+                  Add Holdings
+                </Button>
+              </Box>
+              {portfolioHoldings &&
+              portfolioHoldingsTableData != null &&
+              portfolioHoldingsTableData.length !== 0 ? (
+                <Box sx={{ py: 2 }}>
+                  <PortfolioHoldingsStandardTable
+                    sizeData={setSizeData}
+                    pageData={setPageData}
+                    rows={portfolioHoldings.holdings ?? []}
+                    totalData={filteredPortfolioHoldings}
+                    pageNumber={pageData}
+                    updatedHoldingData={setUpdateHoldingValues}
+                    deleteHolding={setDeleteHolding}
+                  />
+                </Box>
+              ) : (
+                <Box sx={{ py: 2, display: "flex", justifyContent: "center" }}>
+                  <Typography
+                    variant="h2"
+                    color="textDisabled"
+                    sx={{ fontStyle: "italic" }}
+                  >
+                    No Holdings
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Container>
+          <Snackbar
+            anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
+            open={openSnackBar !== ""}
+            autoHideDuration={3000}
+            onClose={handleCloseSnackBar}
+          >
+            <Alert
+              onClose={handleCloseSnackBar}
+              severity="success"
+              variant="filled"
+              sx={{ width: "100%" }}
+            >
+              {openSnackBar}
+            </Alert>
+          </Snackbar>
         </Box>
-      </Container>
-      <Snackbar
-        anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
-        open={openSnackBar !== ""}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackBar}
-      >
-        <Alert
-          onClose={handleCloseSnackBar}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {openSnackBar}
-        </Alert>
-      </Snackbar>
-    </Box>
+      )}
+    </>
   );
 }
