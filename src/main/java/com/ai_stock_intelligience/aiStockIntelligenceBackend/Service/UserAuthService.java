@@ -36,8 +36,14 @@ public class UserAuthService {
        users.setLastName(user.getLastName());
        users.setEmail(user.getEmail());
        users.setPasswordHash(bCryptPasswordEncoder.encode(user.getPassword()));
-
-        return userRepository.save(users);
+       userRepository.save(users);
+       Authentication authentication = authenticationManager.authenticate(
+               new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+       if(authentication.isAuthenticated()){
+           AuthenticationUserIdProjection userId = userRepository.findProjectedByEmail(user.getEmail());
+           return jwtService.generateToken(user.getEmail(), userId.getId());
+       }
+       return "Failed";
     }
 
     public String loginAccount(LoginRequestDto user) {
