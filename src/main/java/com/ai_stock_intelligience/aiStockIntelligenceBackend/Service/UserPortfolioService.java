@@ -61,13 +61,7 @@ public class UserPortfolioService {
     public List<PortfolioInfoDto> getListOfPortfoliosByUser(String keyword) {
         Long currentUserId = authenticationService.getCurrentUserId(); //JWt
         List<PortfolioInfoDto> portfolioList;
-
-        if(keyword != null){
-            portfolioList = filterPortfoliosByNameByUser(keyword);
-        }
-        else{
-            portfolioList = userPortfolioRepository.findByUserIdAndDeletedAtIsNull(currentUserId);
-        }
+        portfolioList = userPortfolioRepository.getPortfolioDetailsWithTotalHoldings(currentUserId, keyword == null ? "" : keyword);
         return portfolioList;
     }
 
@@ -107,10 +101,5 @@ public class UserPortfolioService {
             return true;
         }
         return false;
-    }
-
-    public List<PortfolioInfoDto> filterPortfoliosByNameByUser(String keyword) {
-        Long currentUserId = authenticationService.getCurrentUserId();
-        return userPortfolioRepository.filterSearchPortfoliosByNameByUser(keyword, currentUserId);
     }
 }
