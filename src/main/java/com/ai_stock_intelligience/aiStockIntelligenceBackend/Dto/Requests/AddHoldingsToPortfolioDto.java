@@ -1,5 +1,6 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -19,6 +20,17 @@ public class AddHoldingsToPortfolioDto {
 
     @PositiveOrZero(message = "Average Price has to be greater than or equal to 0")
     private Double avgPrice;
+
+    @NotEmpty(message = "Stock Ticker is required")
+    private String ticker;
+
+    public String getTicker() {
+        return ticker;
+    }
+
+    public void setTicker(String ticker) {
+        this.ticker = ticker;
+    }
 
     public Long getStockId() {
         return stockId;
