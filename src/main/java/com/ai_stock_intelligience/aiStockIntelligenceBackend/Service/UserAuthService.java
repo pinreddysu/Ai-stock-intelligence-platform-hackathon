@@ -52,9 +52,7 @@ public class UserAuthService {
         );
         if (authentication.isAuthenticated()){
             AuthenticationUserIdProjection userId = userRepository.findProjectedByEmail(user.getEmail());
-            String token = jwtService.generateToken(user.getEmail(), userId.getId());
-            System.out.println(token);
-            return token;
+            return jwtService.generateToken(user.getEmail(), userId.getId());
         }
         else{
             return "Failed";
