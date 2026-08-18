@@ -31,7 +31,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import { Search } from "@mui/icons-material";
 import portfolioService from "@/services/portfolioService";
-import { PortfolioInfo } from "@/types/portfolioInfoTypes";
+import { DeletePortfolioInfo, PortfolioInfo } from "@/types/portfolioInfoTypes";
+import DeleteDialog from "@/components/DeleteDialog";
 
 export default function Portfolio() {
   const router = useRouter();
@@ -53,6 +54,10 @@ export default function Portfolio() {
     null,
   );
   const [userPortfolio, setUserPortfolio] = useState<PortfolioInfo[]>([]);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deletePortfolioId, setDeletePortfolioId] = useState<number>();
+  const [deleteDialogData, setDeleteDialogData] =
+    useState<DeletePortfolioInfo>();
   const handleOpen = () => {
     setOpen(true);
   };
@@ -72,8 +77,7 @@ export default function Portfolio() {
     });
   };
 
-  const handleDelete = async (portfolio: PortfolioInfo) => {
-    const portfolioId = portfolio.id;
+  const handleDelete = async (portfolioId: number) => {
     try {
       const response = await portfolioService.deleteUserPortfolioById({
         id: portfolioId,
@@ -85,6 +89,12 @@ export default function Portfolio() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (deletePortfolioId) {
+      handleDelete(deletePortfolioId);
+    }
+  }, [deletePortfolioId]);
 
   const handleEdit = (portfolio: PortfolioInfo) => {
     setEditPortfolio(true);
@@ -100,7 +110,7 @@ export default function Portfolio() {
 
   const hasChange =
     portfolio.portfolioName !== orignalPortfolio.portfolioName ||
-    portfolio.description !== orignalPortfolio.description;
+    (portfolio.description ?? "") !== (orignalPortfolio.description ?? "");
 
   const getPortfolios = async () => {
     try {
@@ -175,6 +185,10 @@ export default function Portfolio() {
     } catch (error: any) {
       console.error(error);
     }
+  };
+
+  const handleDeleteDialog = (data: DeletePortfolioInfo) => {
+    setDeleteDialogData(data);
   };
 
   return (
@@ -285,7 +299,7 @@ export default function Portfolio() {
                       }}
                       id="portfolioDescription"
                       name="portfolioDescription"
-                      value={portfolio.description}
+                      value={portfolio.description ?? ""}
                       label="Portfolio Description"
                       fullWidth
                       variant="outlined"
@@ -306,7 +320,8 @@ export default function Portfolio() {
                           loading ||
                           !hasChange ||
                           portfolio.portfolioName.trim() === "" ||
-                          portfolio.description.trim() === ""
+                          (portfolio.description?.trim() === "" &&
+                            portfolio.description.length !== 0)
                         }
                       >
                         {loading ? "Updating" : "update"}
@@ -334,6 +349,7 @@ export default function Portfolio() {
               id="searchPortfolio"
               name="searchPortfolio"
               value={searchValue}
+              disabled={userPortfolio.length === 0}
               sx={{ width: "50%" }}
               placeholder=" Search portfolio"
               onChange={(e) => {
@@ -431,13 +447,30 @@ export default function Portfolio() {
                       View Portfolio
                     </Button>
                     <Button
+                      key={item.id}
                       size="small"
                       color="error"
-                      onClick={() => handleDelete(item)}
+                      onClick={() => {
+                        setOpenDeleteDialog(true);
+                        handleDeleteDialog({
+                          id: item.id,
+                          portfolioName: item.portfolioName,
+                          description: item.description ?? "",
+                          type: "portfolio",
+                        });
+                      }}
                       startIcon={<DeleteIcon />}
                     >
                       Delete
                     </Button>
+                    {deleteDialogData && (
+                      <DeleteDialog
+                        openDeleteDialog={openDeleteDialog}
+                        closeDialog={setOpenDeleteDialog}
+                        deleteConfirmation={setDeletePortfolioId}
+                        holdingDataOrPortfolio={deleteDialogData}
+                      />
+                    )}
                   </CardActions>
                 </Card>
               </Grid>
