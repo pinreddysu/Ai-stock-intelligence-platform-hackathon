@@ -74,26 +74,32 @@ public class PortfolioHoldingsService {
     }
 
 
-    public boolean addHoldings(AddHoldingsToPortfolioDto portfolioHoldingsDetails) {
+    public boolean addHoldings(List<AddHoldingsToPortfolioDto> portfolioHoldingsDetails) {
         //JWT user retrieval
         Long currentUserId = authenticationService.getCurrentUserId();
-        if (portfolioHoldingsRepository
-                .existsByUserPortfolioIdAndStocksIdAndUserPortfolioUserIdAndDeletedAtIsNull
-                        (portfolioHoldingsDetails.getPortfolioId(),
-                portfolioHoldingsDetails.getStockId(), currentUserId)){
-            return true;
-        }
+        List<PortfolioHoldings> portfolioHoldingsList = new ArrayList<>();
+        for(AddHoldingsToPortfolioDto holdings: portfolioHoldingsDetails) {
+            if (portfolioHoldingsRepository
+                    .existsByUserPortfolioIdAndStocksIdAndUserPortfolioUserIdAndDeletedAtIsNull
+                            (holdings.getPortfolioId(), holdings.getStockId(), currentUserId)){
+                return true;
+            }
 
-        UserPortfolio userPortfolio = userPortfolioRepository.findByIdAndUserIdAndDeletedAtIsNull(
-                portfolioHoldingsDetails.getPortfolioId(), currentUserId);
-        Stocks stocks = stocksRepository.findById(portfolioHoldingsDetails.getStockId())
-                .orElseThrow();
-        PortfolioHoldings portfolioHoldings = new PortfolioHoldings();
-        portfolioHoldings.setUserPortfolio(userPortfolio);
-        portfolioHoldings.setShares(portfolioHoldingsDetails.getShares());
-        portfolioHoldings.setAvgPrice(portfolioHoldingsDetails.getAvgPrice());
-        portfolioHoldings.setStocks(stocks);
-        portfolioHoldingsRepository.save(portfolioHoldings);
+            UserPortfolio userPortfolio = userPortfolioRepository.findByIdAndUserIdAndDeletedAtIsNull(
+                    holdings.getPortfolioId(), currentUserId);
+            StocksDto stocksDto = stocksService.getStocksDetails(holdings.getTicker().trim());
+            Stocks stocks = stocksRepository.findById(stocksDto.getId())
+                    .orElseThrow();
+
+            PortfolioHoldings portfolioHoldings = new PortfolioHoldings();
+            portfolioHoldings.setUserPortfolio(userPortfolio);
+            portfolioHoldings.setShares(holdings.getShares());
+            portfolioHoldings.setAvgPrice(holdings.getAvgPrice());
+            portfolioHoldings.setStocks(stocks);
+            portfolioHoldingsList.add(portfolioHoldings);
+//            portfolioHoldingsRepository.save(portfolioHoldings);
+        }
+        portfolioHoldingsRepository.saveAll(portfolioHoldingsList);
         return false;
     }
 
