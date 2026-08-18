@@ -33,7 +33,7 @@ public class ImportStockPriceService {
         this.pricesRepository = pricesRepository;
     }
 
-    public PortfolioValueAndUpdatedAtDto importStockPrices(String ticker){
+    public StockCurrentPrices importStockPrices(String ticker){
         String json = stockPriceClient.importStockPrices(ticker);
         List<StockPricesDto> stockPricesDto = mapper.readValue(json,
                 new TypeReference<List<StockPricesDto>>() {});
@@ -60,6 +60,12 @@ public class ImportStockPriceService {
                 );
         stockCurrentPrices.setMarketTimeStamp(dateTime);
         pricesRepository.save(stockCurrentPrices);
+        return stockCurrentPrices;
+    }
+
+    public PortfolioValueAndUpdatedAtDto importStockPricesForPortfolioValue(String ticker){
+        StockCurrentPrices stockCurrentPrices = importStockPrices(ticker);
         return new PortfolioValueAndUpdatedAtDto(stockCurrentPrices.getPrices(), stockCurrentPrices.getUpdatedAt(), stockCurrentPrices.getMarketTimeStamp());
     }
+
 }
