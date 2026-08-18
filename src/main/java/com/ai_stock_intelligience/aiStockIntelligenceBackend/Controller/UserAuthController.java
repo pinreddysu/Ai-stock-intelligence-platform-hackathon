@@ -2,7 +2,6 @@ package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.LoginRequestDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Requests.RegisterRequestDto;
-import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.Users;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.UserAuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class UserAuthController {
     }
 
     @PostMapping("/Create")
-    public ResponseEntity<Users> createAccount(@Valid @RequestBody RegisterRequestDto user){
+    public ResponseEntity<String> createAccount(@Valid @RequestBody RegisterRequestDto user){
         return ResponseEntity.ok(userAuthService.createAccount(user));
     }
 
@@ -31,7 +30,8 @@ public class UserAuthController {
     }
 
     @PostMapping("/Login")
-    public String loginAccount(@Valid @RequestBody LoginRequestDto user){
-        return userAuthService.loginAccount(user);
+    public ResponseEntity<String> loginAccount(@Valid @RequestBody LoginRequestDto user){
+
+        return ResponseEntity.ok(userAuthService.loginAccount(user));
     }
 }
