@@ -50,7 +50,7 @@ public class JwtService {
 
     //method to convert string key into bytes and creating secure object so other parts of code cannot modify it
     public SecretKey getKey(){
-        System.out.println(secretKey);
+//        System.out.println(secretKey);
 //        byte[] keyBytes = Decoders.BASE64
 //                .decode(secretKey); //converts string key to bytes, (Assumption the plain english text is not the right password, its like a secret code)
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8); //converts plain english key to bytes
