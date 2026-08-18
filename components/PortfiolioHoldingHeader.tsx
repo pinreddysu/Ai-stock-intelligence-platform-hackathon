@@ -105,7 +105,7 @@ export default function PortfolioHoldingHeader({
         holdingDataOrPortfolio={{
           id: portfolioInfo.id,
           portfolioName: portfolioInfo.portfolioName,
-          description: portfolioInfo.description,
+          description: portfolioInfo.description?? "",
           type: "portfolio",
         }}
       />
@@ -114,7 +114,7 @@ export default function PortfolioHoldingHeader({
         rowDataOrPortfolio={{
           id: portfolioInfo.id,
           portfolioName: portfolioInfo.portfolioName,
-          description: portfolioInfo.description,
+          description: portfolioInfo.description ?? "",
           type: "portfolio",
         }}
         closeDialog={setOpenEditDialog}
