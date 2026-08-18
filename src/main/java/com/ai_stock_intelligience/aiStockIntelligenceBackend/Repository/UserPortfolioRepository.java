@@ -24,13 +24,12 @@ public interface UserPortfolioRepository extends JpaRepository<UserPortfolio, Lo
 
     List<UserPortfolio> findAllByIdInAndUserIdAndDeletedAtIsNull(List<Long> portfoliosList, Long currentUserId);
 
-    @Query(
-            """
-                    SELECT u FROM UserPortfolio u WHERE LOWER(u.portfolioName)
-                    LIKE LOWER(CONCAT('%', :keyword, '%')) AND u.user.id = :currentUserId
-                    AND u.deletedAt IS NULL"""
-    )
-    List<PortfolioInfoDto> filterSearchPortfoliosByNameByUser(@Param("keyword") String keyword,
-                                                                 @Param("currentUserId") Long currentUserId);
-
+    @Query("""
+            SELECT up.portfolioName AS portfolioName, up.id AS id, up.description AS description,
+            COUNT(ph.id) AS portfolioHoldings FROM UserPortfolio up LEFT OUTER JOIN PortfolioHoldings ph ON
+            up.id = ph.userPortfolio.id WHERE ph.deletedAt IS NULL AND up.deletedAt is NULL AND
+            up.user.id = :userId AND (LOWER(up.portfolioName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(up.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) GROUP BY up.id
+            """)
+    List<PortfolioInfoDto> getPortfolioDetailsWithTotalHoldings(@Param("userId") Long userId, @Param("keyword") String keyword);
 }
