@@ -1,21 +1,40 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Service;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.BasicStockDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.StockMoreDetailsDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.StocksDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.StockCurrentPrices;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Models.UserPortfolio;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.StockCurrentPricesRepository;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.StocksRepository;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Repository.UserPortfolioRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class StocksService {
 
     private final StocksRepository stocksRepo;
     private final ImportStocksDetailsService importStocksDetailsService;
+    private final UserPortfolioRepository userPortfolioRepository;
+    private final AuthenticationService authenticationService;
+    private final StockCurrentPricesRepository stockCurrentPricesRepository;
+    private final ImportStockPriceService importStockPrices;
 
-    public StocksService(StocksRepository stocksRepo, ImportStocksDetailsService importStocksDetailsService) {
+    public StocksService(StocksRepository stocksRepo, ImportStocksDetailsService importStocksDetailsService,
+                         UserPortfolioRepository userPortfolioRepository, AuthenticationService authenticationService,
+                         StockCurrentPricesRepository stockCurrentPricesRepository, ImportStockPriceService importStockPrices) {
         this.stocksRepo = stocksRepo;
         this.importStocksDetailsService = importStocksDetailsService;
+        this.authenticationService = authenticationService;
+        this.userPortfolioRepository = userPortfolioRepository;
+        this.stockCurrentPricesRepository = stockCurrentPricesRepository;
+        this.importStockPrices = importStockPrices;
     }
 
     public Page<BasicStockDto> getStocksList(Pageable pageable){
