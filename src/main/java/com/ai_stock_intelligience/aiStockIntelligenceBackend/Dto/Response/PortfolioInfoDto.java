@@ -5,4 +5,5 @@ public interface PortfolioInfoDto {
     Long getId();
     String getPortfolioName();
     String getDescription();
+    Long getPortfolioHoldings();
 }
