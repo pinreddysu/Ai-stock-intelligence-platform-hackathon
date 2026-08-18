@@ -19,6 +19,8 @@ public class PortfolioDetailsDto {
 
     private Long portfolioHoldings;
 
+    private Long filteredPortfolioHoldings;
+
     private Double portfolioInvested;
 
     private Double gainOrLoss;
@@ -255,5 +257,13 @@ public class PortfolioDetailsDto {
 
     public void setGainOrLossPercent(Double gainOrLossPercent) {
         this.gainOrLossPercent = gainOrLossPercent;
+    }
+
+    public Long getFilteredPortfolioHoldings() {
+        return filteredPortfolioHoldings;
+    }
+
+    public void setFilteredPortfolioHoldings(Long filteredPortfolioHoldings) {
+        this.filteredPortfolioHoldings = filteredPortfolioHoldings;
     }
 }
