@@ -39,7 +39,7 @@ public class UserPortfolioService {
         UserPortfolio portfolio = new UserPortfolio();
         portfolio.setUser(users);
         portfolio.setPortfolioName(userPortfolio.getPortfolioName());
-        portfolio.setDescription(userPortfolio.getDescription());
+        portfolio.setDescription(userPortfolio.getDescription().trim().isEmpty() ? null : userPortfolio.getDescription());
         userPortfolioRepository.save(portfolio);
         return false;
     }
