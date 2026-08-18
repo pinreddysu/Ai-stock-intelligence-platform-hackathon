@@ -10,86 +10,85 @@ import {
   InputAdornment,
   CardContent,
   Button,
+  InputLabel,
+  Alert,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useState } from "react";
+import {
+  Visibility,
+  VisibilityOff,
+  EmailOutlined,
+  LockOutlined,
+} from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import authService from "@/services/authService";
+import { useRouter } from "next/navigation";
+import LeftSide from "./LeftSideWelcomePage";
 
 type WelcomePageProps = {
   title: string;
   description: string;
-  firstName: boolean;
-  lastName: boolean;
+  register: boolean;
+  login: boolean;
 };
 
 export default function WelcomePage({ props }: { props: WelcomePageProps }) {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [errors, setErrors] = useState(false);
+  const [loginVerification, setLoginVerification] = useState("");
+  const [createAccountDetails, setCreateAccountDetails] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
+  const [loginAccountDetails, setLoginAccountDetails] = useState({
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
-  const text = [
-    {
-      title: "Portfolio Tracking",
-      description: (
-        <div>
-          Track and manage all your portfolios <br /> in one place
-        </div>
-      ),
-    },
-    {
-      title: " AI Insights",
-      description: (
-        <div>
-          Get AI-driven insights and <br /> recommendations
-        </div>
-      ),
-    },
-    {
-      title: "Performance Analytics",
-      description: (
-        <div>
-          Analyze performance with advanced <br /> charts and metrics
-        </div>
-      ),
-    },
-    {
-      title: "Market Intelligence",
-      description: (
-        <div>
-          Stay updated with market trends
-          <br /> and relevant news
-        </div>
-      ),
-    },
-  ];
 
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (props.firstName) {
-      const data = {
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        passwordHash: password,
-      };
-      return data;
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) router.replace("/portfolio");
+  }, []);
+
+  const handleSubmit = async () => {
+    if (props.register) {
+      const data = createAccountDetails; //validations left
+
+      await authService
+        .create(data)
+        .then((response) => localStorage.setItem("token", response))
+        .catch((response) => console.log(response));
     } else {
-      const data = {
-        email: email,
-        passwordHash: password,
-      };
-      return data;
+      const data = loginAccountDetails;
+      try {
+        const response = await authService.login(data);
+        localStorage.setItem("token", response.data);
+        router.push("/portfolio");
+      } catch (error: any) {
+        if (error.response?.status === 401) {
+          setLoginVerification("Invalid password or email address");
+        } else {
+          console.error("Unable to login user", error);
+        }
+      }
     }
   };
   return (
     <Grid
       container
       // 1. Lowered breakpoint from 'md' to 'sm' (600px) so it splits on almost all laptops/monitors
-      direction={{ xs: "column", sm: "row" }}
+      direction={{ xs: "row-reverse", sm: "row" }}
       sx={{
         width: "100vw",
         minHeight: "100vh",
@@ -98,94 +97,9 @@ export default function WelcomePage({ props }: { props: WelcomePageProps }) {
         overflowX: "hidden",
       }}
     >
+      <LeftSide />
       <Grid
         item
-        xs={12}
-        sm={6}
-        sx={{
-          // 2. Hardcode flex properties to force the 50% split engine to cooperate
-          flexBasis: { xs: "100%", sm: "50%" },
-          maxWidth: { xs: "100%", sm: "50%" },
-          height: { xs: "auto", sm: "100vh" },
-          mb: { xs: 6, sm: 0 },
-          pb: { xs: 4, sm: 0 },
-          backgroundImage: `url(${"/leftSide.png"})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
-          pt: 6,
-          pl: 4,
-          boxSizing: "border-box",
-        }}
-      >
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          <Typography
-            variant="h3"
-            sx={{ fontWeight: "bold", color: "#ffffff" }}
-          >
-            PIE
-          </Typography>
-          <Typography variant="subtitle2" sx={{ color: "#ffffff" }}>
-            AI Portfolio
-            <br />
-            Intelligence Engine
-          </Typography>
-        </Box>
-        <Typography
-          variant="h4"
-          sx={{ fontWeight: "bold", color: "#ffffff", mt: 8 }}
-        >
-          AI-Powered Insights.
-        </Typography>
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Typography
-            variant="h4"
-            sx={{ fontWeight: "bold", color: "#ffffff", mt: 0 }}
-          >
-            Smarter
-          </Typography>
-          <Typography
-            variant="h4"
-            sx={{ fontWeight: "bold", color: "#16a0b2", mt: 0 }}
-          >
-            Investments.
-          </Typography>
-        </Box>
-        <Typography variant="subtitle1" sx={{ color: "#ffffff", mt: 3 }}>
-          Track your portfolios, analyze performance,
-          <br />
-          and get AI-driven insights to make
-          <br />
-          smarter investment decisions.
-        </Typography>
-
-        <Box sx={{ mt: 4 }}>
-          {text.map((item) => (
-            <Typography
-              key={item.title}
-              variant="subtitle2"
-              sx={{ fontWeight: "bold", color: "#ffffff", mt: 2 }}
-            >
-              {item.title}
-              <br />
-              <Typography
-                variant="caption"
-                sx={{ color: "#ffffff", mt: 0, fontSize: "0.75rem" }}
-              >
-                {item.description}
-              </Typography>
-            </Typography>
-          ))}
-        </Box>
-      </Grid>
-
-      {/* Right side Grid Item (Bottom on Mobile / Right on Desktop) */}
-      <Grid
-        item="true"
         xs={12}
         sm={6}
         sx={{
@@ -200,124 +114,247 @@ export default function WelcomePage({ props }: { props: WelcomePageProps }) {
         }}
       >
         <Card
-          elevation={3}
+          elevation={8}
           sx={{
             maxWidth: 440,
             width: "100%",
             mx: "auto",
-            bgcolor: "#ffffff",
+            bgcolor: "background.paper",
+            color: "text.primary",
             border: "none",
           }}
         >
           <CardContent sx={{ p: { xs: 2, sm: 4 } }}>
-            <Box component="form" noValidate autoComplete="off">
+            <Box
+              component="form"
+              noValidate
+              autoComplete="off"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                await handleSubmit();
+              }}
+            >
               <Stack spacing={3}>
                 <Box>
-                  <Typography
-                    variant="h5"
-                    align="center"
-                    sx={{ fontWeight: "bold", mb: 1 }}
-                  >
-                    {props.title}
-                  </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    align="center"
-                    sx={{ color: "#666666" }}
-                  >
-                    {props.description}
-                  </Typography>
-                </Box>
-                {props.firstName && (
-                  <TextField
-                    required
-                    fullWidth
-                    id="firstName"
-                    label="First Name"
-                    variant="outlined"
-                    name="firstName"
-                    autoComplete="name"
-                    autoFocus
-                    error={errors}
-                    onChange={(e) => {
-                        if(e.target.value.length === 0){
-                            setErrors(true)
-                        }
-                        else{
-                            setFirstName(e.target.value);
-                        }
-                      
-                    }}
-                  />
-                )}
-                {props.lastName && (
-                  <TextField
-                    required
-                    fullWidth
-                    id="lastName"
-                    label="Last Name"
-                    variant="outlined"
-                    name="lastName"
-                    autoComplete="family-name"
-                    onChange={(e) => {
-                      setLastName(e.target.value);
-                    }}
-                  />
-                )}
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  variant="outlined"
-                  name="email"
-                  autoComplete="email"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <TextField
-                  required
-                  fullWidth
-                  id="password"
-                  label="Password"
-                  variant="outlined"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                  }}
-                  slotProps={{
-                    input: {
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            edge="end"
+                  <Box>
+                    <Typography
+                      variant="h5"
+                      align="center"
+                      sx={{ fontWeight: "bold", mb: 0, color: "text.primary" }}
+                    >
+                      {props.title}
+                    </Typography>
+                    <Typography
+                      variant="subtitle1"
+                      align="center"
+                      sx={{ color: "text.secondary", mb: 3 }}
+                    >
+                      {props.description}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    {loginVerification.length !== 0 && (
+                      <Alert variant="outlined" severity="error">
+                        {loginVerification}
+                      </Alert>
+                    )}
+                    {props.register && (
+                      <>
+                        <Box>
+                          <InputLabel
+                            required
+                            size="small"
+                            variant="standard"
+                            // error={errors}
+                            sx={{ color: "text.primary", mb: 3 }}
                           >
-                            {showPassword ? <Visibility /> : <VisibilityOff />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    },
+                            First Name
+                          </InputLabel>
+                          <TextField
+                            required
+                            id="firstName"
+                            variant="outlined"
+                            name="firstName"
+                            value={createAccountDetails.firstName}
+                            autoComplete="name"
+                            autoFocus
+                            fullWidth
+                            slotProps={{
+                              htmlInput: { maxLength: 24 },
+                            }}
+                            // error={errors}
+                            placeholder="Enter Your First Name"
+                            onChange={(e) => {
+                              setCreateAccountDetails({
+                                ...createAccountDetails,
+                                firstName: e.target.value,
+                              });
+                            }}
+                          />
+                        </Box>
+                        <Box>
+                          <InputLabel
+                            required
+                            size="small"
+                            variant="standard"
+                            // error={errors}
+                            sx={{ color: "text.primary", mb: 3 }}
+                          >
+                            Last Name
+                          </InputLabel>
+                          <TextField
+                            required
+                            fullWidth
+                            value={createAccountDetails.lastName}
+                            id="lastName"
+                            variant="outlined"
+                            name="lastName"
+                            autoComplete="family-name"
+                            placeholder="Enter Your Last Name"
+                            slotProps={{
+                              htmlInput: {
+                                maxLength: 24,
+                              },
+                            }}
+                            onChange={(e) => {
+                              setCreateAccountDetails({
+                                ...createAccountDetails,
+                                lastName: e.target.value,
+                              });
+                            }}
+                          />
+                        </Box>
+                      </>
+                    )}
+                    <Box sx={{ mb: 0 }}>
+                      <InputLabel
+                        required
+                        size="small"
+                        variant="standard"
+                        sx={{ color: "text.primary", mb: 3 }}
+                      >
+                        Email Address
+                      </InputLabel>
+                      <TextField
+                        required
+                        fullWidth
+                        id="email"
+                        variant="outlined"
+                        name="email"
+                        autoComplete="email"
+                        value={
+                          props.register
+                            ? createAccountDetails.email
+                            : loginAccountDetails.email
+                        }
+                        placeholder="Enter Your Email Address"
+                        slotProps={{
+                          input: {
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <EmailOutlined />
+                              </InputAdornment>
+                            ),
+                          },
+                          htmlInput: {
+                            maxLength: 30,
+                          },
+                        }}
+                        onChange={(e) =>
+                          props.register
+                            ? setCreateAccountDetails({
+                                ...createAccountDetails,
+                                email: e.target.value,
+                              })
+                            : setLoginAccountDetails({
+                                ...loginAccountDetails,
+                                email: e.target.value,
+                              })
+                        }
+                      />
+                    </Box>
+                    <Box>
+                      <InputLabel
+                        required
+                        size="small"
+                        variant="standard"
+                        // error={errors}
+                        sx={{ color: "text.primary", mb: 3 }}
+                      >
+                        Password
+                      </InputLabel>
+                      <TextField
+                        required
+                        fullWidth
+                        id="password"
+                        placeholder="Enter Your Password"
+                        variant="outlined"
+                        value={
+                          props.register
+                            ? createAccountDetails.password
+                            : loginAccountDetails.password
+                        }
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="current-password"
+                        onChange={(e) => {
+                          props.register
+                            ? setCreateAccountDetails({
+                                ...createAccountDetails,
+                                password: e.target.value,
+                              })
+                            : setLoginAccountDetails({
+                                ...loginAccountDetails,
+                                password: e.target.value,
+                              });
+                        }}
+                        slotProps={{
+                          input: {
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <LockOutlined />
+                              </InputAdornment>
+                            ),
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  aria-label="toggle password visibility"
+                                  onClick={handleClickShowPassword}
+                                  edge="end"
+                                >
+                                  {showPassword ? (
+                                    <Visibility />
+                                  ) : (
+                                    <VisibilityOff />
+                                  )}
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Stack>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{ p: 2, justifyContent: "center", mt: 2 }}
+              >
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#1b5cdf",
+                    "&:hover": { bgcolor: "primary.dark" },
                   }}
-                />
+                >
+                  {props.register ? "Sign Up" : "Sign In"}
+                </Button>
               </Stack>
             </Box>
           </CardContent>
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{ p: 2, justifyContent: "center" }}
-          >
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              sx={{ backgroundColor: "#1b5cdf" }}
-            >
-              {props.title === "Welcome Back" ? "Sign In" : "Sign Up"}
-            </Button>
-          </Stack>
         </Card>
       </Grid>
     </Grid>
