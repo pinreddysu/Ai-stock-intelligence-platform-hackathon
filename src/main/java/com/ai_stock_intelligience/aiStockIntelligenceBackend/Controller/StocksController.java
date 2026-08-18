@@ -17,12 +17,12 @@ public class StocksController {
     }
 
     @GetMapping("/getStocks")
-    public ResponseEntity<Page<BasicStockDto>> getStocksList(
-            @RequestParam(required = false) String keyword, Pageable pageable){
-        if (keyword != null){
-            return ResponseEntity.ok(stocks.getStocksListWithSearch(keyword, pageable));
+    public ResponseEntity<BasicStockDto> getStocksList(
+            @RequestParam String keyword, @RequestParam Long portfolioId, int page){
+        if(!keyword.trim().isEmpty()) {
+            return ResponseEntity.ok(stocks.getStocksListWithSearch(keyword, portfolioId, page));
         }
-        return ResponseEntity.ok(stocks.getStocksList(pageable));
+        return null;
     }
 
     @GetMapping("/getStockDetails")
