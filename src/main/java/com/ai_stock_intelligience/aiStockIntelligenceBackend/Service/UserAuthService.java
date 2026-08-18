@@ -30,7 +30,7 @@ public class UserAuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public Users createAccount(RegisterRequestDto user){
+    public String createAccount(RegisterRequestDto user){
        Users users = new Users();
        users.setFirstName(user.getFirstName());
        users.setLastName(user.getLastName());
