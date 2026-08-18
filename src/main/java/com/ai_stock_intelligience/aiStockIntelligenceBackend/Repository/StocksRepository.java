@@ -15,18 +15,29 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StocksRepository extends JpaRepository<Stocks, Long> {
 
-    Page<BasicStockDto> findBy(Pageable pageable);
+//    Page<BasicStockDto> findBy(Pageable pageable);
 
-    @Query(
-            """
-               SELECT s FROM Stocks s WHERE
-               (LOWER(s.ticker) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-               LOWER(s.companyName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-               LOWER(s.exchange) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-               LOWER(s.sector) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
-               LOWER(s.industry) LIKE LOWER(CONCAT('%', :keyword, '%')))"""
+    @Query("""
+    SELECT s.id AS id, s.ticker AS ticker, s.companyName AS companyName
+    FROM Stocks s
+    WHERE NOT EXISTS (
+        SELECT ph
+        FROM PortfolioHoldings ph
+        WHERE ph.stocks.id = s.id
+          AND ph.userPortfolio.id = :portfolioId
+          AND ph.deletedAt IS NULL
     )
-    Page<BasicStockDto> getStocksList(@Param("keyword") String keyword, Pageable pageable);
+    AND (
+        LOWER(s.ticker) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(s.companyName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(s.exchange) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(s.sector) LIKE LOWER(CONCAT('%', :keyword, '%'))
+        OR LOWER(s.industry) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    )
+"""
+    )
+    Page<BasicStockDto.StockList> getStocksList(@Param("keyword") String keyword, @Param("portfolioId") Long portfolioId,
+                                      Pageable pageable);
 
     Stocks findByTicker(String ticker);
 
