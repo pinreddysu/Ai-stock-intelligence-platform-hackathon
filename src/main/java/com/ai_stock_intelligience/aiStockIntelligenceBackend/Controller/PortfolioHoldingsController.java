@@ -51,13 +51,19 @@ public class PortfolioHoldingsController {
         return ResponseEntity.internalServerError().body("List of holdings could not be deleted");
     }
 
-    @GetMapping("/getAllHoldings")
-    public ResponseEntity<PortfolioDetailsDto> filterPortfoliosByNameByUser(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings, @RequestParam(required = false) String keyword){
-        return ResponseEntity.ok(portfolioHoldingsService.portfolioSummary(portfolioHoldings, keyword, false));
+    @PostMapping("/getAllHoldings")
+    public ResponseEntity<PortfolioDetailsDto> filterPortfoliosByNameByUser(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings,
+                                                                            @RequestParam(required = false) String keyword,
+                                                                            @RequestParam(defaultValue = "0") int page,
+                                                                            @RequestParam(defaultValue = "5") int size){
+        return ResponseEntity.ok(portfolioHoldingsService.portfolioSummary(portfolioHoldings, keyword, false, page, size));
     }
 
-    @GetMapping("/getAllHoldings/refresh")
-    public ResponseEntity<PortfolioDetailsDto> refreshPortfolioStats(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings){
-        return ResponseEntity.ok(portfolioHoldingsService.portfolioSummary(portfolioHoldings,null, true));
+    @PostMapping("/getAllHoldings/refresh")
+    public ResponseEntity<PortfolioDetailsDto> refreshPortfolioStats(@Valid @RequestBody GetPortfolioHoldingsDto portfolioHoldings,
+                                                                     @RequestParam(required = false) String keyword,
+                                                                     @RequestParam(defaultValue = "0") int page,
+                                                                     @RequestParam(defaultValue = "5") int size){
+        return ResponseEntity.ok(portfolioHoldingsService.portfolioSummary(portfolioHoldings,keyword, true, page, size));
     }
 }
