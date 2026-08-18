@@ -1,10 +1,9 @@
 package com.ai_stock_intelligience.aiStockIntelligenceBackend.Controller;
 
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.BasicStockDto;
+import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.StockMoreDetailsDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Dto.Response.StocksDto;
 import com.ai_stock_intelligience.aiStockIntelligenceBackend.Service.StocksService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +28,11 @@ public class StocksController {
     @GetMapping("/getStockDetails")
     public ResponseEntity<StocksDto> getStockDetails(@RequestParam String ticker){
         return ResponseEntity.ok(stocks.getStocksDetails(ticker));
+    }
+
+    @GetMapping("/getStockMoreDetails")
+    public ResponseEntity<StockMoreDetailsDto> getMoreStockDetails(@RequestParam String ticker){
+        return ResponseEntity.ok(stocks.getStockMoreDetails(ticker));
     }
 
 // TEMP data stock data like ticker and company
