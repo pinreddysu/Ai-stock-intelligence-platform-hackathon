@@ -39,9 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")){
             token = header.substring(UserConstants.extractTokenStart);
             email = jwtService.extractEmail(token);
-            System.out.println(email);
             userId = jwtService.extractUserId(token);
-//            System.out.println(userId);
         }
 //checks if it is the credentials provided by user authenticated and there is valid email and userid data from token
         if (email != null && userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
