@@ -37,12 +37,28 @@ public class StocksService {
         this.importStockPrices = importStockPrices;
     }
 
-    public Page<BasicStockDto> getStocksList(Pageable pageable){
-        return stocksRepo.findBy(pageable);
-    }
+//    public Page<BasicStockDto> getStocksList(Pageable pageable){
+//        return stocksRepo.findBy(pageable);
+//    }
 
-    public Page<BasicStockDto> getStocksListWithSearch(String keyword, Pageable pageable) {
-        return stocksRepo.getStocksList(keyword, pageable);
+    public BasicStockDto getStocksListWithSearch(String keyword, Long portfolioId, int page) {
+        Long currentUserId = authenticationService.getCurrentUserId();
+        UserPortfolio portfolio =
+                userPortfolioRepository.findByIdAndUserIdAndDeletedAtIsNull(
+                        portfolioId,
+                        currentUserId
+                );
+
+        if (portfolio == null) {
+            throw new RuntimeException("Portfolio not found");
+        }
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<BasicStockDto.StockList> stockList = stocksRepo.getStocksList(keyword, portfolioId, pageable);
+        BasicStockDto stockListData = new BasicStockDto();
+        stockListData.setStockLists(stockList.getContent());
+        stockListData.setTotalElements(stockList.getTotalElements());
+        return stockListData;
+
     }
 
     public StocksDto getStocksDetails(String ticker){
