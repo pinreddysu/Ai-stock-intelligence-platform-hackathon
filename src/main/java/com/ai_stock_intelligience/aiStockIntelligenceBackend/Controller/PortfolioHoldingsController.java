@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class PortfolioHoldingsController {
 
@@ -19,7 +21,7 @@ public class PortfolioHoldingsController {
     }
 
     @PostMapping("/addStocks")
-    public ResponseEntity<String> addHoldingsToPortfolio(@Valid @RequestBody AddHoldingsToPortfolioDto portfolioHoldings){
+    public ResponseEntity<String> addHoldingsToPortfolio(@Valid @RequestBody List<AddHoldingsToPortfolioDto> portfolioHoldings){
         if (portfolioHoldingsService.addHoldings(portfolioHoldings))
             return ResponseEntity.badRequest().body("Stock already exists in this portfolio");
 
