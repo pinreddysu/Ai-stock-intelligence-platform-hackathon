@@ -5,14 +5,16 @@ import { useState } from "react";
 
 type SearchProp = {
   page: string;
+  disabled: boolean;
   searchData: (value: string) => void;
 };
 
-export default function SearchBar({ page, searchData }: SearchProp) {
+export default function SearchBar({ page, searchData, disabled }: SearchProp) {
   const [searchValue, setSearchValue] = useState("");
 
   return (
     <TextField
+      disabled={disabled}
       variant="outlined"
       size="small"
       id="searchPortfolio"
