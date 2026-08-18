@@ -57,7 +57,8 @@ export default function EditDialog({
   const editTrim =
     rowDataOrPortfolio.type === "holding"
       ? shares.trim().length === 0 || avgPrice.trim().length === 0
-      : portfolioName.trim().length === 0 || description.trim().length === 0;
+      : portfolioName.trim().length === 0 ||
+        (description?.trim() === "" && description.length !== 0);
 
   const hasChange =
     rowDataOrPortfolio.type === "holding"
@@ -74,14 +75,14 @@ export default function EditDialog({
         id: rowDataOrPortfolio.id,
         shares: Number(shares),
         avgPrice: Number(avgPrice),
-        type: "holding"
+        type: "holding",
       });
     } else {
       updatedHoldingData({
         id: rowDataOrPortfolio.id,
         portfolioName: portfolioName,
         description: description,
-        type: "portfolio"
+        type: "portfolio",
       });
     }
     handleClose();
