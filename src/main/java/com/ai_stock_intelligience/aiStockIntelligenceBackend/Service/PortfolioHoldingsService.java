@@ -163,7 +163,7 @@ public class PortfolioHoldingsService {
         double portfolioGainOrLoss = 0.0;
         LocalDateTime updatedAt = null;
         LocalDateTime marketTimeStamp = null;
-        Long holdingsInPortfolio = (long) portfolioSummary.getHoldings().size();
+//        Long holdingsInPortfolio = (long) portfolioSummary.getHoldings().size();
 
         for (PortfolioDetailsDto.HoldingsDto holding : portfolioSummary.getHoldings()) {
             double currentValue = 0.0;
