@@ -56,7 +56,10 @@ export default function PortfolioHoldingsStandardTable({
     pageData(0);
   };
   return (
-    <TableContainer component={Paper} sx={{ gap: 2, display: "flex" }}>
+    <TableContainer
+      component={Paper}
+      sx={{ gap: 2, display: "flex", boxShadow: 8 }}
+    >
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>
