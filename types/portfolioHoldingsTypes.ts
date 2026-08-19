@@ -34,6 +34,13 @@ export interface PortfolioDetailsAndHoldings {
   lastUpdatedAt: string;
   marketTimeStamp: string;
   holdings: Holdings[];
+  sectorAllocationDto: PortfolioAllocationData[];
+}
+
+export interface PortfolioAllocationData {
+  sector: string;
+  sectorValue: number;
+  allocationPercent: number;
 }
 
 export interface ColumnData {
@@ -89,7 +96,7 @@ export interface EditHoldingRequest {
   id: number;
   shares: number;
   avgPrice: number;
-  type: "holding"
+  type: "holding";
 }
 
 export interface EditHoldingData {
@@ -99,5 +106,5 @@ export interface EditHoldingData {
   exchange: string;
   shares: number;
   avgPrice: number;
-  type: "holding"
+  type: "holding";
 }
