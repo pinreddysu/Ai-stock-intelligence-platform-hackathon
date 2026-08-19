@@ -29,6 +29,8 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import PortfolioHoldingsStandardTable from "@/components/PortfolioHoldingsStandardTable";
 import portfolioService from "@/services/portfolioService";
 import { EditPortfolioInfo } from "@/types/portfolioInfoTypes";
+import AllocationChart from "@/components/AllocationChart";
+import PortfolioInsights from "@/components/PortfolioInsights";
 
 export default function PortfolioDetails() {
   const [open, setOpen] = useState(false);
@@ -299,7 +301,7 @@ export default function PortfolioDetails() {
                 Portfolio details have been updated!
               </Alert>
             </Snackbar>
-            <Box sx={{ py: 4 }}>
+            <Box sx={{ pt: 4 }}>
               {portfolioHoldings && portfolioHoldings.holdings.length !== 0 && (
                 <PortfolioStats
                   props={{
@@ -315,6 +317,24 @@ export default function PortfolioDetails() {
                 />
               )}
             </Box>
+            {portfolioHoldings && portfolioHoldings.holdings.length != 0 && (
+              <Box
+                sx={{
+                  pt: 0,
+                  py: 4,
+                  display: "flex",
+                  gap: 2,
+                  flexDirection: { xs: "column", sm: "row" },
+                  justifyContent: { xs: "flex-start" },
+                }}
+              >
+                <AllocationChart
+                  props={portfolioHoldings.sectorAllocationDto}
+                />
+
+                <PortfolioInsights />
+              </Box>
+            )}
             <Box
               sx={{
                 py: 0,
