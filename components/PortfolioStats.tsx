@@ -1,5 +1,5 @@
 import { PortfolioStatsData } from "@/types/portfolioInfoTypes";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export default function PortfolioStats({
   props,
