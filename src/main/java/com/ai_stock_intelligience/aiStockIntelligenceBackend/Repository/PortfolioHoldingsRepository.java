@@ -75,4 +75,14 @@ public interface PortfolioHoldingsRepository extends JpaRepository<PortfolioHold
             AND ph.deletedAt IS NULL
             """)
     List<PortfolioDetailsDto.HoldingsDto> getPortfolioHoldings(@Param("id") Long portfolioId);
+
+    @Query("""
+            SELECT ph.stocks.sector AS sector, SUM(ph.shares * scp.prices) AS sectorValue,
+            SUM(ph.shares * scp.prices) / SUM(SUM(ph.shares * scp.prices)) OVER() * 100 AS allocationPercent
+            FROM PortfolioHoldings ph INNER JOIN StockCurrentPrices scp ON
+            ph.stocks.id = scp.stocks.id WHERE ph.userPortfolio.id = :portfolioId
+            AND ph.userPortfolio.user.id = :currentUserId
+            AND ph.deletedAt IS NULL GROUP BY ph.stocks.sector
+            """)
+    List<PortfolioDetailsDto.SectorAllocationDto> getSectorAllocation(@Param("currentUserId") Long currentUserId, @Param("portfolioId") Long portfolioId);
 }

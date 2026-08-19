@@ -29,10 +29,48 @@ public class PortfolioDetailsDto {
 
     private List<HoldingsDto> holdingsDto;
 
+    private List<SectorAllocationDto> sectorAllocationDto;
+
     public PortfolioDetailsDto(String portfolioName, Long id, String description) {
         this.portfolioName = portfolioName;
         this.id = id;
         this.description = description;
+    }
+
+    public static class SectorAllocationDto{
+        private String sector;
+        private Double sectorValue;
+        private Double allocationPercent;
+
+        public SectorAllocationDto(String sector, Double sectorValue, Double allocationPercent) {
+            this.sector = sector;
+            this.sectorValue = sectorValue;
+            this.allocationPercent = allocationPercent;
+        }
+
+        public String getSector() {
+            return sector;
+        }
+
+        public void setSector(String sector) {
+            this.sector = sector;
+        }
+
+        public Double getSectorValue() {
+            return sectorValue;
+        }
+
+        public void setSectorValue(Double sectorValue) {
+            this.sectorValue = sectorValue;
+        }
+
+        public Double getAllocationPercent() {
+            return allocationPercent;
+        }
+
+        public void setAllocationPercent(Double allocationPercent) {
+            this.allocationPercent = allocationPercent;
+        }
     }
 
     public static class HoldingsDto{
@@ -189,6 +227,14 @@ public class PortfolioDetailsDto {
 
     public void setHoldingsDto(List<HoldingsDto> holdingsDto) {
         this.holdingsDto = holdingsDto;
+    }
+
+    public List<SectorAllocationDto> getSectorAllocationDto() {
+        return sectorAllocationDto;
+    }
+
+    public void setSectorAllocationDto(List<SectorAllocationDto> sectorAllocationDto) {
+        this.sectorAllocationDto = sectorAllocationDto;
     }
 
     public String getPortfolioName() {

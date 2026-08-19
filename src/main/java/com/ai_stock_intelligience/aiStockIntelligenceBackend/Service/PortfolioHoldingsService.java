@@ -147,6 +147,7 @@ public class PortfolioHoldingsService {
             holdingsDto.setGainOrLossPercent((gainOrLoss/ holdingsDto.getInvestedAmount())*100);
         }
         portfolioAllocation(portfolioSummary);
+        portfolioSummary.setSectorAllocationDto(portfolioHoldingsRepository.getSectorAllocation(currentUserId, portfolioHoldings.getPortfolioId()));
         return portfolioSummary;
     }
 
