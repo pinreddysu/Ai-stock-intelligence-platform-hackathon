@@ -40,6 +40,7 @@ public interface PortfolioHoldingsRepository extends JpaRepository<PortfolioHold
             StockCurrentPrices scp
             ON scp.stocks.id = ph.stocks.id
             WHERE ph.userPortfolio.id = :id
+            AND ph.userPortfolio.user.id = :currentUserId
             AND ph.deletedAt IS NULL
             AND (LOWER(ph.stocks.ticker) LIKE LOWER(CONCAT('%', :keyword, '%'))
             OR LOWER(ph.stocks.companyName) LIKE LOWER(CONCAT('%', :keyword, '%'))
@@ -50,7 +51,8 @@ public interface PortfolioHoldingsRepository extends JpaRepository<PortfolioHold
             """)
     Page<PortfolioDetailsDto.HoldingsDto> getPortfolioHoldings(@Param("id") Long portfolioId,
                                                                @Param("keyword") String keyword,
-                                                               Pageable pageable);
+                                                               Pageable pageable,
+                                                               @Param("currentUserId") Long currentUserId);
 
     @Query("""
             SELECT ph.id AS holdingId,
@@ -72,9 +74,11 @@ public interface PortfolioHoldingsRepository extends JpaRepository<PortfolioHold
             StockCurrentPrices scp
             ON scp.stocks.id = ph.stocks.id
             WHERE ph.userPortfolio.id = :id
+            AND ph.userPortfolio.user.id = :currentUserId
             AND ph.deletedAt IS NULL
             """)
-    List<PortfolioDetailsDto.HoldingsDto> getPortfolioHoldings(@Param("id") Long portfolioId);
+    List<PortfolioDetailsDto.HoldingsDto> getPortfolioHoldings(@Param("id") Long portfolioId,
+                                                               @Param("currentUserId") Long currentUserId);
 
     @Query("""
             SELECT ph.stocks.sector AS sector, SUM(ph.shares * scp.prices) AS sectorValue,
@@ -85,4 +89,18 @@ public interface PortfolioHoldingsRepository extends JpaRepository<PortfolioHold
             AND ph.deletedAt IS NULL GROUP BY ph.stocks.sector
             """)
     List<PortfolioDetailsDto.SectorAllocationDto> getSectorAllocation(@Param("currentUserId") Long currentUserId, @Param("portfolioId") Long portfolioId);
+
+    @Query("""
+            SELECT ph.stocks.ticker AS ticker, ph.stocks.companyName as companyName,
+            SUM(ph.shares * scp.prices) AS sectorValue,
+            SUM(ph.shares * scp.prices) / SUM(SUM(ph.shares * scp.prices)) OVER() * 100 AS allocationPercent,
+            (SUM(ph.shares * scp.prices)-SUM(ph.shares * ph.avgPrice)) / SUM(ph.shares * ph.avgPrice) * 100
+            AS stockPerformance
+            FROM PortfolioHoldings ph INNER JOIN StockCurrentPrices scp ON
+            ph.stocks.id = scp.stocks.id WHERE ph.userPortfolio.id = :portfolioId
+            AND ph.userPortfolio.user.id = :currentUserId
+            AND ph.deletedAt IS NULL GROUP BY ph.stocks.ticker, ph.stocks.companyName, ph.stocks.sector
+            ORDER BY SUM(ph.shares * scp.prices) DESC
+            """)
+    List<PortfolioDetailsDto.MaxStockAllocation> getMaxStockAllocation(@Param("portfolioId") Long portfolioId, @Param("currentUserId") Long currentUserId);
 }
