@@ -35,6 +35,15 @@ export interface PortfolioDetailsAndHoldings {
   marketTimeStamp: string;
   holdings: Holdings[];
   sectorAllocationDto: PortfolioAllocationData[];
+  maxStockAllocation: MaxStockAllocationData[];
+}
+
+export interface MaxStockAllocationData {
+  ticker: string;
+  companyName: string;
+  sectorValue: number;
+  allocationPercent: number;
+  stockPerformance: number;
 }
 
 export interface PortfolioAllocationData {
