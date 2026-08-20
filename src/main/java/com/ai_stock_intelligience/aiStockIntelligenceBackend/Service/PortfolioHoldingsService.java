@@ -132,11 +132,18 @@ public class PortfolioHoldingsService {
                 portfolioHoldings.getPortfolioId(), currentUserId);
         PortfolioDetailsDto portfolioSummary = new PortfolioDetailsDto(portfolioInfo.getPortfolioName(),
                 portfolioInfo.getId(), portfolioInfo.getDescription());
-        portfolioSummary.setHoldingsDto(portfolioHoldingsRepository.getPortfolioHoldings(portfolioInfo.getId()));
+        portfolioSummary.setHoldingsDto(portfolioHoldingsRepository.getPortfolioHoldings(portfolioInfo.getId(), currentUserId));
+        portfolioInsights(portfolioSummary, portfolioInfo.getId(), currentUserId);
         portfolioSummary.setPortfolioHoldings((long) portfolioSummary.getHoldings().size());
         portfolioStats(portfolioSummary,refresh);
+        portfolioHoldingsPagination(portfolioSummary, portfolioInfo.getId(), keyword, pageable, currentUserId);
+        portfolioAllocation(portfolioSummary);
+        portfolioSummary.setSectorAllocationDto(portfolioHoldingsRepository.getSectorAllocation(currentUserId, portfolioHoldings.getPortfolioId()));
+        return portfolioSummary;
+    }
 
-        Page<PortfolioDetailsDto.HoldingsDto> holdingsDtoPage = portfolioHoldingsRepository.getPortfolioHoldings(portfolioInfo.getId(), keyword == null ? "":keyword, pageable );
+    private void portfolioHoldingsPagination(PortfolioDetailsDto portfolioSummary, Long portfolioId, String keyword, Pageable pageable, Long currentUserId) {
+        Page<PortfolioDetailsDto.HoldingsDto> holdingsDtoPage = portfolioHoldingsRepository.getPortfolioHoldings(portfolioId, keyword == null ? "":keyword, pageable, currentUserId );
         portfolioSummary.setHoldingsDto(holdingsDtoPage.getContent());
         portfolioSummary.setFilteredPortfolioHoldings(holdingsDtoPage.getTotalElements());
         for(PortfolioDetailsDto.HoldingsDto holdingsDto: portfolioSummary.getHoldings()){
@@ -146,9 +153,11 @@ public class PortfolioHoldingsService {
             holdingsDto.setGainOrLoss(gainOrLoss);
             holdingsDto.setGainOrLossPercent((gainOrLoss/ holdingsDto.getInvestedAmount())*100);
         }
-        portfolioAllocation(portfolioSummary);
-        portfolioSummary.setSectorAllocationDto(portfolioHoldingsRepository.getSectorAllocation(currentUserId, portfolioHoldings.getPortfolioId()));
-        return portfolioSummary;
+    }
+
+    private void portfolioInsights(PortfolioDetailsDto portfolioSummary, Long portfolioId, Long currentUserId) {
+        portfolioSummary.setMaxStockAllocation(
+                portfolioHoldingsRepository.getMaxStockAllocation(portfolioId, currentUserId));
     }
 
     public void portfolioAllocation(PortfolioDetailsDto portfolioSummary){
