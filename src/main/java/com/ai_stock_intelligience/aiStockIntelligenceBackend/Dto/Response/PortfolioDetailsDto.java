@@ -31,10 +31,69 @@ public class PortfolioDetailsDto {
 
     private List<SectorAllocationDto> sectorAllocationDto;
 
+    private List<MaxStockAllocation> maxStockAllocation;
+
     public PortfolioDetailsDto(String portfolioName, Long id, String description) {
         this.portfolioName = portfolioName;
         this.id = id;
         this.description = description;
+    }
+
+    public static class MaxStockAllocation {
+        private String ticker;
+        private String companyName;
+        private Double sectorValue;
+        private Double allocationPercent;
+        private Double stockPerformance;
+
+        public MaxStockAllocation(String ticker, String companyName, Double sectorValue,
+                                  Double allocationPercent, Double stockPerformance) {
+            this.ticker = ticker;
+            this.companyName = companyName;
+            this.sectorValue = sectorValue;
+            this.allocationPercent = allocationPercent;
+            this.stockPerformance = stockPerformance;
+        }
+
+        public String getTicker() {
+            return ticker;
+        }
+
+        public void setTicker(String ticker) {
+            this.ticker = ticker;
+        }
+
+        public String getCompanyName() {
+            return companyName;
+        }
+
+        public void setCompanyName(String companyName) {
+            this.companyName = companyName;
+        }
+
+        public Double getSectorValue() {
+            return sectorValue;
+        }
+
+        public void setSectorValue(Double sectorValue) {
+            this.sectorValue = sectorValue;
+        }
+
+        public Double getAllocationPercent() {
+            return allocationPercent;
+        }
+
+        public void setAllocationPercent(Double allocationPercent) {
+            this.allocationPercent = allocationPercent;
+        }
+
+        public Double getStockPerformance() {
+            return stockPerformance;
+        }
+
+        public void setStockPerformance(Double stockPerformance) {
+            this.stockPerformance = stockPerformance;
+        }
     }
 
     public static class SectorAllocationDto{
@@ -311,5 +370,13 @@ public class PortfolioDetailsDto {
 
     public void setFilteredPortfolioHoldings(Long filteredPortfolioHoldings) {
         this.filteredPortfolioHoldings = filteredPortfolioHoldings;
+    }
+
+    public List<MaxStockAllocation> getMaxStockAllocation() {
+        return maxStockAllocation;
+    }
+
+    public void setMaxStockAllocation(List<MaxStockAllocation> maxStockAllocation) {
+        this.maxStockAllocation = maxStockAllocation;
     }
 }
