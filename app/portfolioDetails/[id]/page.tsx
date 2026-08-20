@@ -326,13 +326,17 @@ export default function PortfolioDetails() {
                   gap: 2,
                   flexDirection: { xs: "column", sm: "row" },
                   justifyContent: { xs: "flex-start" },
+                  maxHeight: "auto",
                 }}
               >
                 <AllocationChart
                   props={portfolioHoldings.sectorAllocationDto}
                 />
 
-                <PortfolioInsights />
+                <PortfolioInsights
+                  maxAllocationData={portfolioHoldings.maxStockAllocation}
+                  sectorAllocationData={portfolioHoldings.sectorAllocationDto}
+                />
               </Box>
             )}
             <Box
